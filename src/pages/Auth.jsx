@@ -84,6 +84,7 @@ export default function Auth() {
           name: `${firstName} ${lastName}`,
           email: email,
           role: "landlord",
+          webAuthEnabled: false,
         },
       );
 
@@ -222,12 +223,13 @@ export default function Auth() {
                     type="text"
                     placeholder="John"
                     value={signUpForm.firstName}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      const val = e.target.value;
                       setSignUpForm({
                         ...signUpForm,
-                        firstName: e.target.value,
-                      })
-                    }
+                        firstName: val.charAt(0).toUpperCase() + val.slice(1),
+                      });
+                    }}
                   />
                 </div>
                 <div className={styles.field}>
@@ -236,9 +238,13 @@ export default function Auth() {
                     type="text"
                     placeholder="Smith"
                     value={signUpForm.lastName}
-                    onChange={(e) =>
-                      setSignUpForm({ ...signUpForm, lastName: e.target.value })
-                    }
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setSignUpForm({
+                        ...signUpForm,
+                        lastName: val.charAt(0).toUpperCase() + val.slice(1),
+                      });
+                    }}
                   />
                 </div>
               </div>
