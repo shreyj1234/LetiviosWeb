@@ -596,7 +596,12 @@ function SubscriptionSection({ onCancel, user, stats }) {
       const functions = new Functions(client);
       const execution = await functions.createExecution(
         import.meta.env.VITE_FUNCTION_CREATE_GC_SUBSCRIPTION_ID,
-        JSON.stringify({ tier, email: user.email, name: user.name }),
+        JSON.stringify({
+          tier,
+          email: user.email,
+          name: user.name,
+          number: user.number,
+        }),
         false,
       );
       const result = JSON.parse(execution.responseBody || "{}");
@@ -848,6 +853,10 @@ function AccountSection({ user }) {
           <div className={styles.fieldGroup}>
             <label>Email address</label>
             <input type="email" value={user?.email || ""} readOnly />
+          </div>
+          <div className={styles.fieldGroup}>
+            <label>Phone Number</label>
+            <input type="number" value={user?.number || ""} readOnly />
           </div>
           <button className={styles.btnPrimary} onClick={saveProfile}>
             Save changes
