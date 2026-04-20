@@ -22,6 +22,7 @@ export default function Auth() {
     email: "",
     password: "",
     confirmPassword: "",
+    role: "landlord",
   });
 
   const showError = (msg) => {
