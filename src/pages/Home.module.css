@@ -772,7 +772,29 @@
 }
 
 @media (max-width: 600px) {
-  /* Tighten up hero — remove excessive whitespace */
+  .featureCard {
+    padding: 16px;
+  }
+  .featureIcon {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+  }
+  .featureTitle {
+    font-size: 15px;
+    margin-bottom: 6px;
+  }
+  .featureDesc {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .featureTag {
+    margin-top: 10px;
+    font-size: 10px;
+    padding: 3px 8px;
+  }
   .planName {
     font-size: 9px;
     letter-spacing: 0.4px;
