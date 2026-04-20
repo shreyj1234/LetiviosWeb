@@ -814,13 +814,27 @@ function AccountSection({ user }) {
   const [lastName, setLastName] = useState(
     user?.name?.split(" ").slice(1).join(" ") || "",
   );
+  const [phone, setPhone] = useState(user?.phone || "");
+  const [saving, setSaving] = useState(false);
 
   const saveProfile = async () => {
+    setSaving(true);
     try {
       await account.updateName(`${firstName} ${lastName}`);
-      alert("profile saved");
+
+      // Update phone in users collection
+      await databases.updateDocument(
+        import.meta.env.VITE_APPWRITE_DATABASE_ID,
+        "users",
+        user.$id,
+        { phone: phone },
+      );
+
+      alert("Profile saved!");
     } catch (err) {
       alert(err.message);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -856,10 +870,19 @@ function AccountSection({ user }) {
           </div>
           <div className={styles.fieldGroup}>
             <label>Phone Number</label>
-            <input type="number" value={user?.number || ""} readOnly />
+            <input
+              type="tel"
+              value={phone}
+              placeholder="+44 7700 900000"
+              onChange={(e) => setPhone(e.target.value)}
+            />
           </div>
-          <button className={styles.btnPrimary} onClick={saveProfile}>
-            Save changes
+          <button
+            className={styles.btnPrimary}
+            onClick={saveProfile}
+            disabled={saving}
+          >
+            {saving ? "Saving..." : "Save changes"}
           </button>
         </div>
 
