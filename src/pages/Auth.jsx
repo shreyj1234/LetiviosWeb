@@ -297,7 +297,11 @@ export default function Auth() {
                     className={styles.eyeBtn}
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   >
-                    {showConfirmPassword ? "🙈" : "👁️"}
+                    {showConfirmPassword ? (
+                      <AiOutlineEyeInvisible size={22} color="#9CA3AF" />
+                    ) : (
+                      <AiOutlineEye size={22} color="#9CA3AF" />
+                    )}{" "}
                   </button>
                 </div>
               </div>

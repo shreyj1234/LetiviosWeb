@@ -289,3 +289,28 @@
 .fieldHintLink:hover {
   text-decoration: underline;
 }
+
+.passwordWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+.passwordWrap input {
+  width: 100%;
+  padding-right: 48px !important;
+}
+.eyeBtn {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9ca3af;
+}
