@@ -794,6 +794,7 @@
   .hero {
     min-height: unset;
     padding: 110px 0 40px;
+    border-bottom: 1px solid var(--border2);
   }
   .heroSub {
     font-size: 16px;
@@ -816,11 +817,13 @@
   /* Tighten sections */
   .section {
     padding: 40px 0 50px;
+    border-bottom: 1px solid var(--border2);
   }
 
   .howSection {
     min-height: unset;
     padding: 60px 0 40px;
+    border-bottom: 1px solid var(--border2);
   }
   .featuresHeader {
     padding-top: 0;
