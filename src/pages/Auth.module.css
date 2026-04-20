@@ -1,0 +1,291 @@
+.page {
+  min-height: 100vh;
+  background: var(--bg-soft);
+}
+
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 18px 0;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border2);
+}
+.navInner {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+.navBack {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  transition:
+    color 0.2s,
+    background 0.2s;
+}
+.navBack:hover {
+  color: var(--text);
+  background: var(--blue-soft);
+}
+
+.content {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 120px 24px 80px;
+}
+
+.hero {
+  text-align: center;
+  margin-bottom: 32px;
+}
+.hero h1 {
+  font-family: "DM Serif Display", serif;
+  font-size: clamp(36px, 5vw, 52px);
+  line-height: 1.1;
+  letter-spacing: -1.2px;
+  color: var(--text);
+  margin-bottom: 16px;
+}
+.hero h1 em {
+  font-style: italic;
+  color: var(--blue);
+}
+.hero p {
+  font-size: 17px;
+  font-weight: 300;
+  color: var(--text-light);
+  margin-bottom: 20px;
+}
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--gold-soft);
+  border: 1px solid rgba(192, 138, 42, 0.2);
+  color: var(--gold);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 5px 14px;
+  border-radius: 100px;
+}
+
+.formCard {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 40px 44px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+}
+
+.tabs {
+  display: flex;
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 4px;
+  margin-bottom: 32px;
+}
+.tab {
+  flex: 1;
+  padding: 10px;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-muted);
+  border-radius: 9px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  background: none;
+  font-family: "DM Sans", sans-serif;
+}
+.tabActive {
+  background: var(--blue);
+  color: white;
+  box-shadow: 0 0 16px var(--blue-glow);
+}
+
+.alert {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #b91c1c;
+  padding: 11px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  margin-bottom: 14px;
+}
+
+.field {
+  margin-bottom: 16px;
+}
+.fieldRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.field label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.field input {
+  width: 100%;
+  background: white;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: "DM Sans", sans-serif;
+  font-size: 15px;
+  padding: 12px 14px;
+  outline: none;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+.field input:focus {
+  border-color: var(--blue);
+  box-shadow: 0 0 0 3px rgba(74, 124, 255, 0.1);
+}
+
+.planGrid {
+  display: flex;
+  gap: 12px;
+}
+.planOption {
+  flex: 1;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1.5px solid var(--border);
+  background: var(--bg-soft);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.planOption:hover {
+  border-color: rgba(74, 124, 255, 0.25);
+  transform: translateY(-1px);
+}
+.planSelected {
+  border-color: var(--blue);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(74, 124, 255, 0.08);
+}
+.planName {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.planBadge {
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--blue);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 5px;
+}
+.planPrice {
+  font-family: "DM Serif Display", serif;
+  font-size: 28px;
+  letter-spacing: -0.5px;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.planPrice span {
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+.planProps {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: white;
+  border: 1px solid var(--border);
+  padding: 3px 10px;
+  border-radius: 100px;
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--blue);
+  color: white;
+  font-family: "DM Sans", sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s;
+  box-shadow: 0 0 24px var(--blue-glow);
+  margin-top: 8px;
+}
+.submitBtn:hover {
+  background: var(--blue2);
+  transform: translateY(-1px);
+}
+.submitBtn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 600px) {
+  .formCard {
+    padding: 28px 22px;
+  }
+  .fieldRow {
+    grid-template-columns: 1fr;
+  }
+  .planGrid {
+    flex-direction: column;
+  }
+}
+.fieldHint {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+.fieldHintTerms {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+.fieldHintLink {
+  color: var(--blue);
+  text-decoration: none;
+  font-weight: 500;
+}
+.fieldHintLink:hover {
+  text-decoration: underline;
+}

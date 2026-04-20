@@ -1,0 +1,808 @@
+/* Orbs */
+.orb1,
+.orb2,
+.orb3 {
+  opacity: 0.3;
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+  z-index: 0;
+}
+.orb1 {
+  width: 600px;
+  height: 600px;
+  background: rgba(59, 111, 239, 0.18);
+  top: -200px;
+  left: -200px;
+}
+.orb2 {
+  width: 500px;
+  height: 500px;
+  background: rgba(74, 124, 255, 0.12);
+  bottom: -100px;
+  right: -100px;
+}
+.orb3 {
+  width: 300px;
+  height: 300px;
+  background: rgba(232, 180, 90, 0.06);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* Layout */
+.container {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 0 24px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Nav */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 18px 0;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border2);
+}
+.navInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+}
+.logoIcon {
+  height: 40px;
+}
+.logoTextImg {
+  height: 24px;
+}
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.navLink {
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  padding: 8px 14px;
+  border-radius: 8px;
+  transition:
+    color 0.2s,
+    background 0.2s;
+}
+.navLink:hover {
+  color: var(--text);
+  background: var(--blue-soft);
+}
+.navCta {
+  background: var(--blue);
+  color: white;
+  padding: 9px 20px;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition:
+    background 0.2s,
+    transform 0.15s;
+  box-shadow: 0 0 20px var(--blue-glow);
+  font-family: "DM Sans", sans-serif;
+}
+.navCta:hover {
+  background: var(--blue2);
+  transform: translateY(-1px);
+}
+
+/* Hero */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 100px 0 80px;
+  position: relative;
+  background: radial-gradient(
+    circle at 20% 20%,
+    rgba(74, 124, 255, 0.06),
+    transparent 40%
+  );
+}
+.heroInner {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+}
+.heroSub {
+  font-size: 18px;
+  font-weight: 300;
+  color: var(--text-light);
+  line-height: 1.65;
+  margin-bottom: 40px;
+  max-width: 480px;
+}
+.heroActions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+.heroTrust {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.heroStats {
+  display: flex;
+  gap: 32px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border2);
+}
+
+.hero h1 {
+  font-family: "DM Serif Display", serif;
+  font-size: clamp(36px, 4.5vw, 64px);
+  line-height: 1.05;
+  letter-spacing: -2px;
+  color: var(--text);
+  margin-bottom: 24px;
+  font-weight: 400;
+}
+.hero h1 em {
+  font-style: italic;
+  color: var(--text);
+}
+.statValue {
+  font-family: "DM Serif Display", serif;
+  font-size: 32px;
+  color: var(--text);
+  letter-spacing: -0.5px;
+}
+.statLabel {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-top: 2px;
+}
+.heroNote {
+  margin-top: 20px;
+  font-size: 13px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Buttons */
+.btnPrimary {
+  background: var(--blue);
+  color: white;
+  padding: 14px 28px;
+  border-radius: 12px;
+  font-size: 15px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 0 30px var(--blue-glow);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: "DM Sans", sans-serif;
+}
+.btnPrimary:hover {
+  background: var(--blue2);
+  transform: translateY(-2px);
+}
+
+/* Phone */
+.heroVisual {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+.phoneWrap {
+  position: relative;
+  padding-top: 40px;
+}
+.phoneGlow {
+  position: absolute;
+  inset: -40px;
+  background: radial-gradient(
+    ellipse,
+    rgba(74, 124, 255, 0.2) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+.phone {
+  width: 300px;
+  aspect-ratio: 9/19.5;
+  background: white;
+  border-radius: 44px;
+  border: 1.5px solid rgba(0, 0, 0, 0.08);
+  padding: 16px;
+  box-shadow: 0 40px 80px rgba(0, 0, 0, 0.15);
+  position: relative;
+  animation: float 4s ease-in-out infinite;
+}
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+.phoneNotch {
+  width: 80px;
+  height: 24px;
+  background: #0f172a;
+  border-radius: 0 0 18px 18px;
+  margin: 0 auto 16px;
+}
+.phoneScreen {
+  background: #f8faff;
+  border-radius: 30px;
+  padding: 18px;
+  overflow: hidden;
+  height: calc(100% - 40px);
+  display: flex;
+  flex-direction: column;
+}
+.phoneHeader {
+  background: linear-gradient(135deg, var(--blue), #3b89ff);
+  border-radius: 18px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+.phoneHeaderTitle {
+  font-size: 13px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 2px;
+}
+.phoneHeaderSub {
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.7);
+}
+.phoneHeaderStats {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.phoneStat {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  padding: 6px 8px;
+  text-align: center;
+}
+.phoneStatV {
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+}
+.phoneStatL {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.7);
+}
+.phoneCards {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow: hidden;
+}
+.phoneCard {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.phoneCardIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+.phoneCardTitle {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text);
+}
+.phoneCardSub {
+  font-size: 9px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+.phoneCardBadge {
+  margin-left: auto;
+  font-size: 9px;
+  font-weight: 700;
+  padding: 3px 7px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+/* Sections */
+.section {
+  padding: 80px 0;
+  position: relative;
+  z-index: 1;
+}
+.section:nth-child(even) {
+  background: var(--bg-soft);
+}
+.sectionSub {
+  font-size: 17px;
+  font-weight: 300;
+  color: var(--text-light);
+  line-height: 1.65;
+  max-width: 560px;
+}
+
+/* Features */
+.featuresHeader {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 48px;
+  align-items: start;
+  padding-top: 50px;
+  margin-bottom: 45px;
+}
+.pricingRow {
+  display: flex;
+  gap: 10px;
+}
+.pricingCard {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  min-width: 130px;
+}
+.pricingName {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.popularBadge {
+  font-size: 10px;
+  font-weight: 700;
+  background: var(--blue);
+  color: white;
+  padding: 2px 6px;
+  border-radius: 5px;
+}
+.pricingPrice {
+  font-family: "DM Serif Display", serif;
+  font-size: 28px;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.pricingPrice span {
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 400;
+}
+.pricingProps {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: white;
+  border: 1px solid var(--border);
+  padding: 3px 10px;
+  border-radius: 100px;
+}
+
+.featuresGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+.featureCard {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 28px;
+  transition:
+    transform 0.25s,
+    border-color 0.25s,
+    box-shadow 0.25s;
+}
+.featureCard:hover {
+  transform: translateY(-4px);
+  border-color: rgba(74, 124, 255, 0.35);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+}
+.featureIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: var(--blue-soft);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  margin-bottom: 20px;
+}
+.featureTitle {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 10px;
+}
+.featureDesc {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.65;
+}
+.featureTag {
+  display: inline-block;
+  margin-top: 16px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--blue);
+  background: var(--blue-soft);
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+/* How it works */
+.howSection {
+  min-height: 100vh;
+  display: flex;
+  align-items: start;
+  padding: 120px 0 60px;
+  position: relative;
+  z-index: 1;
+  background: var(--bg-soft);
+}
+.howGrid {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 60px;
+  align-items: start;
+  width: 100%;
+}
+.steps {
+  display: flex;
+  flex-direction: column;
+}
+.step {
+  display: flex;
+  gap: 20px;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--border2);
+}
+.step:last-child {
+  border-bottom: none;
+}
+.stepNum {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  flex-shrink: 0;
+  background: var(--blue-soft);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "DM Serif Display", serif;
+  font-size: 16px;
+  color: var(--blue);
+  margin-top: 2px;
+}
+.stepTitle {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.stepDesc {
+  font-size: 14px;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+.howVisual {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.howVisualHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border2);
+}
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+.howVisualLabel {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-left: 8px;
+}
+.flowBody {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.flowLabel {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  padding: 6px 4px 2px;
+}
+.flowArrow {
+  display: flex;
+  justify-content: center;
+  padding: 4px 0 0;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.flowItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border2);
+  transition: all 0.3s;
+  margin-bottom: 4px;
+}
+.flowItem:hover {
+  background: var(--blue-soft);
+  border-color: var(--border);
+}
+.flowIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.flowItemLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+.flowItemSub {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+.flowStatus {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+/* CTA */
+.ctaSection {
+  background: var(--bg-soft);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 80px 60px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.ctaSection::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 50% 0%,
+    rgba(74, 124, 255, 0.15),
+    transparent 60%
+  );
+}
+.ctaSection p {
+  font-size: 17px;
+  color: var(--text-light);
+  max-width: 480px;
+  margin: 0 auto 36px;
+}
+.ctaActions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+.ctaNote {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Footer */
+.footer {
+  border-top: 1px solid var(--border2);
+  padding: 40px 0;
+  position: relative;
+  z-index: 1;
+}
+.footerInner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.footerLinks {
+  display: flex;
+  gap: 24px;
+}
+.footerLink {
+  font-size: 13px;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.footerLink:hover {
+  color: var(--text);
+}
+.footerCopy {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Scroll animations */
+.reveal {
+  opacity: 1;
+  transform: translateY(0px);
+  transition:
+    opacity 0.65s ease,
+    transform 0.65s ease;
+}
+.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.heroReveal {
+  opacity: 1;
+  transform: translateY(0px);
+}
+.delay1 {
+  transition-delay: 0.1s;
+}
+.delay2 {
+  transition-delay: 0.2s;
+}
+.delay3 {
+  transition-delay: 0.3s;
+}
+.delay4 {
+  transition-delay: 0.4s;
+}
+.delay5 {
+  transition-delay: 0.5s;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .heroInner {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+  .heroVisual {
+    display: none;
+  }
+  .featuresGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .howGrid {
+    grid-template-columns: 1fr;
+  }
+  .ctaSection {
+    padding: 48px 28px;
+  }
+  .featuresHeader {
+    grid-template-columns: 1fr;
+  }
+  .pricingRow {
+    display: none;
+  }
+}
+@media (max-width: 600px) {
+  .featuresGrid {
+    grid-template-columns: 1fr;
+  }
+  .heroStats {
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+}
+.hero h1,
+.featuresHeader h2,
+.steps h2,
+.ctaSection h2 {
+  font-family: "DM Serif Display", serif;
+  font-weight: 400;
+  color: var(--text);
+  letter-spacing: -1.5px;
+}
+
+.featuresHeader h2 {
+  font-size: clamp(32px, 3.5vw, 48px);
+  line-height: 1.05;
+  margin-bottom: 12px;
+}
+
+.featuresHeader h2 em {
+  font-style: italic;
+  color: var(--text);
+}
+
+.steps h2 {
+  font-size: clamp(32px, 3.5vw, 48px);
+  line-height: 1.05;
+}
+
+.steps h2 em {
+  font-style: italic;
+  color: var(--text);
+}
+
+.ctaSection h2 {
+  font-size: clamp(36px, 4vw, 56px);
+  line-height: 1.05;
+  margin-bottom: 16px;
+}
+
+.ctaSection h2 em {
+  font-style: italic;
+  color: var(--text);
+}
