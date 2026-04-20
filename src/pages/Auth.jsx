@@ -108,7 +108,6 @@ export default function Auth() {
       name: "Tier 2",
       price: "£29",
       props: "Up to 15 Properties",
-      popular: true,
     },
     {
       id: "tier1",
@@ -326,12 +325,7 @@ export default function Auth() {
                       className={`${styles.planOption} ${selectedPlan === plan.id ? styles.planSelected : ""}`}
                       onClick={() => setSelectedPlan(plan.id)}
                     >
-                      <div className={styles.planName}>
-                        {plan.name}{" "}
-                        {plan.popular && (
-                          <span className={styles.planBadge}>Popular</span>
-                        )}
-                      </div>
+                      <div className={styles.planName}>{plan.name} </div>
                       <div className={styles.planPrice}>
                         {plan.price}
                         <span>/mo</span>
