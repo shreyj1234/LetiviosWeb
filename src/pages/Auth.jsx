@@ -22,7 +22,6 @@ export default function Auth() {
     email: "",
     password: "",
     confirmPassword: "",
-    role: "landlord",
   });
 
   const showError = (msg) => {
@@ -75,6 +74,7 @@ export default function Auth() {
       );
       await account.createEmailPasswordSession(email, password);
       await account.updatePrefs({ plan: selectedPlan });
+      await account.updatePrefs({ plan: selectedPlan, role: "landlord" });
 
       // Write user to database
       await databases.createDocument(
