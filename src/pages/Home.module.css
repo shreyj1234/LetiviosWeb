@@ -883,3 +883,8 @@
   font-style: italic;
   color: var(--text);
 }
+
+[id="features"],
+[id="how"] {
+  scroll-margin-top: 80px;
+}
