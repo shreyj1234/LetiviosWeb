@@ -55,10 +55,28 @@ export default function Home() {
               />
             </a>
             <div className={styles.navLinks}>
-              <a href="#features" className={styles.navLink}>
+              <a
+                href="#features"
+                className={styles.navLink}
+                onClick={(e) => {
+                  e.preventDefault();
+                  document
+                    .getElementById("features")
+                    .scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+              >
                 Features
               </a>
-              <a href="#how" className={styles.navLink}>
+              <a
+                href="#how"
+                className={styles.navLink}
+                onClick={(e) => {
+                  e.preventDefault();
+                  document
+                    .getElementById("how")
+                    .scrollIntoView({ behavior: "smooth", block: "start" });
+                }}
+              >
                 How it works
               </a>
               <button
