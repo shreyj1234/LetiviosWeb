@@ -293,17 +293,11 @@ export default function Home() {
                   name: "Growth",
                   price: "£29",
                   props: "Up to 15 Properties",
-                  popular: true,
                 },
                 { name: "Pro", price: "£59", props: "Unlimited Properties" },
               ].map((p) => (
                 <div key={p.name} className={styles.pricingCard}>
-                  <div className={styles.pricingName}>
-                    {p.name}{" "}
-                    {p.popular && (
-                      <span className={styles.popularBadge}>Popular</span>
-                    )}
-                  </div>
+                  <div className={styles.pricingName}></div>
                   <div className={styles.pricingPrice}>
                     {p.price}
                     <span>/mo</span>
