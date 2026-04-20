@@ -269,7 +269,11 @@ export default function Home() {
       </section>
 
       {/* Features */}
-      <section id="features" className={styles.section}>
+      <section
+        id="features"
+        className={styles.section}
+        style={{ scrollMarginTop: "80px" }}
+      >
         <div className={styles.container}>
           <div
             ref={addRef}
@@ -369,7 +373,11 @@ export default function Home() {
       </section>
 
       {/* How it works */}
-      <section id="how" className={styles.howSection}>
+      <section
+        id="how"
+        className={styles.howSection}
+        style={{ scrollMarginTop: "80px" }}
+      >
         <div className={styles.container}>
           <div className={styles.howGrid}>
             <div ref={addRef} className={`${styles.steps} ${styles.reveal}`}>
