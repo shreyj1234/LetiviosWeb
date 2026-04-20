@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ID } from "appwrite";
 import styles from "./Auth.module.css";
 import { account, databases } from "../lib/appwrite";
+import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -10,6 +11,9 @@ export default function Auth() {
   const [selectedPlan, setSelectedPlan] = useState("starter");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showSignInPassword, setShowSignInPassword] = useState(false);
 
   const [signInForm, setSignInForm] = useState({ email: "", password: "" });
   const [signUpForm, setSignUpForm] = useState({
@@ -59,6 +63,9 @@ export default function Auth() {
       return showError("Passwords do not match.");
     setLoading(true);
     try {
+      try {
+        await account.deleteSession("current");
+      } catch {}
       const newAccount = await account.create(
         ID.unique(),
         email,
@@ -174,14 +181,27 @@ export default function Auth() {
               </div>
               <div className={styles.field}>
                 <label>Password</label>
-                <input
-                  type="password"
-                  placeholder="Your password"
-                  value={signInForm.password}
-                  onChange={(e) =>
-                    setSignInForm({ ...signInForm, password: e.target.value })
-                  }
-                />
+                <div className={styles.passwordWrap}>
+                  <input
+                    type={showSignInPassword ? "text" : "password"}
+                    placeholder="Your password"
+                    value={signInForm.password}
+                    onChange={(e) =>
+                      setSignInForm({ ...signInForm, password: e.target.value })
+                    }
+                  />
+                  <button
+                    type="button"
+                    className={styles.eyeBtn}
+                    onClick={() => setShowSignInPassword(!showSignInPassword)}
+                  >
+                    {showSignInPassword ? (
+                      <AiOutlineEyeInvisible size={22} color="#9CA3AF" />
+                    ) : (
+                      <AiOutlineEye size={22} color="#9CA3AF" />
+                    )}
+                  </button>
+                </div>
               </div>
               <button
                 className={styles.submitBtn}
@@ -235,34 +255,51 @@ export default function Auth() {
               </div>
               <div className={styles.field}>
                 <label>Password</label>
-                <input
-                  type="password"
-                  placeholder="Min. 8 characters"
-                  value={signUpForm.password}
-                  onChange={(e) =>
-                    setSignUpForm({ ...signUpForm, password: e.target.value })
-                  }
-                />
-                <p className={styles.fieldHint}>
-                  Must be at least 8 characters
-                </p>{" "}
+                <div className={styles.passwordWrap}>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Min. 8 characters"
+                    value={signUpForm.password}
+                    onChange={(e) =>
+                      setSignUpForm({ ...signUpForm, password: e.target.value })
+                    }
+                  />
+                  <button
+                    type="button"
+                    className={styles.eyeBtn}
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <AiOutlineEyeInvisible size={22} color="#9CA3AF" />
+                    ) : (
+                      <AiOutlineEye size={22} color="#9CA3AF" />
+                    )}
+                  </button>
+                </div>
               </div>
+
               <div className={styles.field}>
                 <label>Confirm password</label>
-                <input
-                  type="password"
-                  placeholder="Re-enter your password"
-                  value={signUpForm.confirmPassword}
-                  onChange={(e) =>
-                    setSignUpForm({
-                      ...signUpForm,
-                      confirmPassword: e.target.value,
-                    })
-                  }
-                />
-                <p className={styles.fieldHint}>
-                  Make sure both passwords match
-                </p>{" "}
+                <div className={styles.passwordWrap}>
+                  <input
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="Re-enter your password"
+                    value={signUpForm.confirmPassword}
+                    onChange={(e) =>
+                      setSignUpForm({
+                        ...signUpForm,
+                        confirmPassword: e.target.value,
+                      })
+                    }
+                  />
+                  <button
+                    type="button"
+                    className={styles.eyeBtn}
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? "🙈" : "👁️"}
+                  </button>
+                </div>
               </div>
               <div className={styles.field}>
                 <label>Choose your plan</label>
