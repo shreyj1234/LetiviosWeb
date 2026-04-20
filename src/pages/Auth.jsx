@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { account } from "../lib/appwrite";
 import { ID } from "appwrite";
 import styles from "./Auth.module.css";
+import { account, databases } from "../lib/appwrite";
 
 export default function Auth() {
   const navigate = useNavigate();
@@ -59,7 +59,7 @@ export default function Auth() {
       return showError("Passwords do not match.");
     setLoading(true);
     try {
-      await account.create(
+      const newAccount = await account.create(
         ID.unique(),
         email,
         password,
@@ -67,6 +67,19 @@ export default function Auth() {
       );
       await account.createEmailPasswordSession(email, password);
       await account.updatePrefs({ plan: selectedPlan });
+
+      // Write user to database
+      await databases.createDocument(
+        import.meta.env.VITE_APPWRITE_DATABASE_ID,
+        "users",
+        newAccount.$id, // use same ID as auth account
+        {
+          name: `${firstName} ${lastName}`,
+          email: email,
+          role: "landlord",
+        },
+      );
+
       navigate("/dashboard");
     } catch (err) {
       setLoading(false);
