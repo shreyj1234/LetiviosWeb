@@ -785,9 +785,8 @@
     margin-top: 12px;
   }
   .heroStats {
-    gap: 16px;
-    margin-top: 16px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 12px;
   }
   .statValue {
     font-size: 22px;

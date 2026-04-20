@@ -267,7 +267,18 @@
     grid-template-columns: 1fr;
   }
   .planGrid {
-    flex-direction: column;
+    flex-direction: row;
+    gap: 8px;
+  }
+  .planOption {
+    padding: 10px 8px;
+  }
+  .planPrice {
+    font-size: 20px;
+  }
+  .planProps {
+    font-size: 9px;
+    padding: 2px 6px;
   }
 }
 .fieldHint {

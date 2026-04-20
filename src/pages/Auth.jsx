@@ -8,7 +8,7 @@ import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 export default function Auth() {
   const navigate = useNavigate();
   const [tab, setTab] = useState("signin");
-  const [selectedPlan, setSelectedPlan] = useState("starter");
+  const [selectedPlan, setSelectedPlan] = useState("tier3");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -98,19 +98,24 @@ export default function Auth() {
 
   const plans = [
     {
-      id: "starter",
-      name: "Starter",
+      id: "tier3",
+      name: "Tier 3",
       price: "£15",
       props: "Up to 5 Properties",
     },
     {
-      id: "growth",
-      name: "Growth",
+      id: "tier2",
+      name: "Tier 2",
       price: "£29",
       props: "Up to 15 Properties",
       popular: true,
     },
-    { id: "pro", name: "Pro", price: "£59", props: "Unlimited Properties" },
+    {
+      id: "tier1",
+      name: "Tier 1",
+      price: "£59",
+      props: "Unlimited Properties",
+    },
   ];
 
   return (
