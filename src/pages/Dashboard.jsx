@@ -81,9 +81,9 @@ export default function Dashboard() {
   };
 
   const planLabels = {
-    tier3: "tier3 Plan",
-    tier2: "tier2 Plan",
-    tier1: "tier1Plan",
+    tier3: "Tier 3 Plan",
+    tier2: "Tier 2 Plan",
+    tier1: "Tier 1 Plan",
   };
   const firstName = user?.name?.split(" ")[0] || "there";
 
