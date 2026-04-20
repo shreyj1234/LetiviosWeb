@@ -372,7 +372,7 @@
   grid-template-columns: 1fr auto;
   gap: 48px;
   align-items: start;
-  padding-top: 50px;
+  padding-top: 20px;
   margin-bottom: 45px;
 }
 .pricingRow {
@@ -731,7 +731,6 @@
   transition-delay: 0.5s;
 }
 
-/* Responsive */
 @media (max-width: 900px) {
   .heroInner {
     grid-template-columns: 1fr;
@@ -765,10 +764,50 @@
     font-size: 13px;
   }
 }
+
 @media (max-width: 600px) {
+  /* Tighten up hero — remove excessive whitespace */
+  .hero {
+    min-height: unset;
+    padding: 90px 0 40px;
+  }
+  .heroSub {
+    font-size: 16px;
+    margin-bottom: 24px;
+  }
+  .heroNote {
+    margin-top: 12px;
+  }
+  .heroStats {
+    gap: 16px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+  .statValue {
+    font-size: 22px;
+  }
+
+  /* Tighten sections */
+  .section {
+    padding: 80px 0 160px;
+    position: relative;
+    z-index: 1;
+  }
+  .howSection {
+    min-height: unset;
+    padding: 60px 0 40px;
+  }
+  .featuresHeader {
+    padding-top: 0;
+    margin-bottom: 24px;
+  }
+
+  /* Features single column */
   .featuresGrid {
     grid-template-columns: 1fr;
   }
+
+  /* Footer centered */
   .footerInner {
     flex-direction: column;
     gap: 16px;
@@ -777,16 +816,26 @@
   .footerLinks {
     gap: 16px;
   }
-  .heroStats {
-    gap: 16px;
-  }
-  .statValue {
-    font-size: 24px;
-  }
+
+  /* CTA */
   .ctaSection {
     padding: 40px 20px;
   }
+
+  /* Nav — hide text links, show only button on very small screens */
+  .navLinks {
+    gap: 4px;
+  }
+  .navLink {
+    font-size: 11px;
+    padding: 5px 6px;
+  }
+  .navCta {
+    padding: 7px 12px;
+    font-size: 12px;
+  }
 }
+
 .hero h1,
 .featuresHeader h2,
 .steps h2,
