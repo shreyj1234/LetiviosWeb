@@ -85,6 +85,7 @@ export default function Auth() {
           email: email,
           role: "landlord",
           webAuthEnabled: false,
+          onboardingComplete: false,
         },
       );
 
