@@ -351,7 +351,7 @@
 
 /* Sections */
 .section {
-  padding: 80px 0 120px;
+  padding: 80px 0 160px;
   position: relative;
   z-index: 1;
 }
@@ -769,7 +769,7 @@
   /* Tighten up hero — remove excessive whitespace */
   .hero {
     min-height: unset;
-    padding: 90px 0 40px;
+    padding: 110px 0 40px;
   }
   .heroSub {
     font-size: 16px;
@@ -789,10 +789,9 @@
 
   /* Tighten sections */
   .section {
-    padding: 80px 0 160px;
-    position: relative;
-    z-index: 1;
+    padding: 40px 0 50px;
   }
+
   .howSection {
     min-height: unset;
     padding: 60px 0 40px;
@@ -827,6 +826,7 @@
     gap: 4px;
   }
   .navLink {
+    display: none;
     font-size: 11px;
     padding: 5px 6px;
   }
