@@ -152,7 +152,7 @@ export default function Auth() {
             <br />
             possible rate.
           </p>
-          <div className={styles.eyebrow}>30-day free trial upon Sign Up</div>
+          <div className={styles.eyebrow}>14-day free trial upon Sign Up</div>
         </div>
 
         <div className={styles.formCard}>
