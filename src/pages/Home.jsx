@@ -141,7 +141,7 @@ export default function Home() {
                   <div className={styles.statLabel}>Full control</div>
                 </div>
                 <div className={styles.statItem}>
-                  <div className={styles.statValue}>30 days</div>
+                  <div className={styles.statValue}>14 days</div>
                   <div className={styles.statLabel}>Free trial</div>
                 </div>
                 <div className={styles.statItem}>
@@ -376,7 +376,7 @@ export default function Home() {
                 {
                   n: "1",
                   title: "Create your account",
-                  desc: "Sign up on this website and choose a plan. Your 30-day free trial starts immediately — no card required.",
+                  desc: "Sign up on this website and choose a plan. Your 14-day free trial starts immediately — no card required.",
                 },
                 {
                   n: "2",
@@ -560,7 +560,7 @@ export default function Home() {
               </button>
             </div>
             <div className={styles.ctaNote}>
-              30 days free · No card required · Cancel any time
+              14 days free · No card required · Cancel any time
             </div>
           </div>
         </div>

@@ -116,7 +116,7 @@ export default async ({ req, res, log, error }) => {
 
         const now = new Date().toISOString();
         const periodEnd = new Date(
-          Date.now() + 30 * 24 * 60 * 60 * 1000,
+          Date.now() + 14 * 24 * 60 * 60 * 1000,
         ).toISOString();
 
         const subUpdate = {
@@ -171,7 +171,7 @@ export default async ({ req, res, log, error }) => {
         if (!landlordId) continue;
 
         const periodEnd = new Date(
-          Date.now() + 30 * 24 * 60 * 60 * 1000,
+          Date.now() + 14 * 24 * 60 * 60 * 1000,
         ).toISOString();
 
         const subRes = await databases.listDocuments(

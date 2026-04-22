@@ -69,8 +69,8 @@ export default async ({ req, res, log, error }) => {
     const daysSinceRegistration =
       (Date.now() - registeredAt) / (1000 * 60 * 60 * 24);
 
-    if (daysSinceRegistration < 30) {
-      const daysLeft = Math.ceil(30 - daysSinceRegistration);
+    if (daysSinceRegistration < 14) {
+      const daysLeft = Math.ceil(14 - daysSinceRegistration);
       return res.json(
         {
           ok: false,
@@ -147,7 +147,7 @@ export default async ({ req, res, log, error }) => {
       tier,
       maxProperties: tierConf.maxProperties,
       currentPeriodEnd: new Date(
-        Date.now() + 30 * 24 * 60 * 60 * 1000,
+        Date.now() + 14 * 24 * 60 * 60 * 1000,
       ).toISOString(),
       monthlyCharge: tierConf.amount / 100,
       gcBillingRequestId: brId, // store so webhook can match

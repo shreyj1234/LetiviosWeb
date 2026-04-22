@@ -31,7 +31,7 @@ export default function Dashboard() {
     properties: 0,
     tenants: 0,
     jobs: 0,
-    trialDaysLeft: 30,
+    trialDaysLeft: 14,
   });
 
   useEffect(() => {
@@ -69,7 +69,7 @@ export default function Dashboard() {
 
     const created = new Date(user.$createdAt);
     const daysUsed = Math.floor((Date.now() - created) / (1000 * 60 * 60 * 24));
-    const daysLeft = Math.max(0, 30 - daysUsed);
+    const daysLeft = Math.max(0, 14 - daysUsed);
     setStats((s) => ({ ...s, trialDaysLeft: daysLeft }));
   }, [user]);
 
@@ -575,7 +575,7 @@ function SubscriptionSection({ onCancel, user, stats }) {
   const trialDaysLeft = trialStartDate
     ? Math.max(
         0,
-        30 - Math.floor((Date.now() - trialStartDate) / (1000 * 60 * 60 * 24)),
+        14 - Math.floor((Date.now() - trialStartDate) / (1000 * 60 * 60 * 24)),
       )
     : null;
 
