@@ -1085,7 +1085,8 @@
 }
 .wBtnApple {
   background: #ffffff;
-  color: #111827;
+  color: #000000;
+  border: 1px solid #e5e7eb;
 }
 .wBtnGoogle {
   background: #ffffff;
