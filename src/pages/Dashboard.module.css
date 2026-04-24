@@ -114,6 +114,13 @@
   flex: 1;
   padding: 32px 36px;
   overflow-y: auto;
+  max-width: 1200px;
+}
+
+@media (max-width: 720px) {
+  .main {
+    padding: 24px 20px;
+  }
 }
 
 /* Page header */
@@ -750,16 +757,16 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    padding: 13px 18px;
+    padding: 14px 20px;
     background: var(--navy2);
     border: none;
     border-bottom: 1px solid var(--border2);
     color: var(--white);
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 600;
     font-family: "DM Sans", sans-serif;
     cursor: pointer;
-    box-sizing: border-box;
+    letter-spacing: 0.2px;
   }
   .sidebarNav {
     display: none;
@@ -780,6 +787,7 @@
   .sidebarExpanded .sidebarNav {
     display: flex;
     animation: slideDown 0.2s ease;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.2));
   }
   @keyframes slideDown {
     from {
@@ -815,6 +823,18 @@
   }
   .subProps {
     grid-template-columns: 1fr 1fr;
+  }
+  .planCardCurrent::after {
+    font-size: 8px;
+    padding: 2px 7px;
+    top: 10px;
+    right: 10px;
+  }
+  .pageHeader h2 {
+    color: #111827;
+  }
+  .pageHeader p {
+    color: #6b7280;
   }
 }
 
