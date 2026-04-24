@@ -99,7 +99,7 @@ export default function Dashboard() {
           onClick={() => setSidebarOpen((o) => !o)}
         >
           <span>{sidebarOpen ? "✕  Close" : "☰  Menu"}</span>
-          <img src="/images/webIcon.png" style={{ height: 28 }} alt="" />
+          <img src="/images/webIcon.png" style={{ height: 26 }} alt="" />
         </button>
         <div className={styles.sidebarNav}>
           <a href="/" className={styles.sidebarLogo}>
