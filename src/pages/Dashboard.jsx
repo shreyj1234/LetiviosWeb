@@ -81,6 +81,40 @@ export default function Dashboard() {
     navigate("/auth");
   };
 
+  const handleCancelSubscription = async () => {
+    setShowCancelModal(false);
+    try {
+      const res = await databases.listDocuments(
+        import.meta.env.VITE_APPWRITE_DATABASE_ID,
+        "subscriptions",
+        [Query.equal("landlordId", user.$id), Query.limit(1)],
+      );
+      if (res.documents.length === 0) {
+        alert("No active subscription found.");
+        return;
+      }
+      const sub = res.documents[0];
+      const gcMandateId = sub.gcMandateId;
+      if (!gcMandateId) {
+        alert("No Direct Debit mandate found.");
+        return;
+      }
+      // Call your cancel Appwrite function
+      const { Functions } = await import("appwrite");
+      const functions = new Functions(client);
+      await functions.createExecution(
+        import.meta.env.VITE_FUNCTION_CANCEL_GC_SUBSCRIPTION_ID,
+        JSON.stringify({ mandateId: gcMandateId }),
+        false,
+      );
+      alert(
+        "Subscription cancelled. Your access continues until the end of your billing period.",
+      );
+    } catch (err) {
+      alert(err.message || "Failed to cancel subscription.");
+    }
+  };
+
   const planLabels = {
     tier3: "Tier 3 Plan",
     tier2: "Tier 2 Plan",
@@ -245,10 +279,7 @@ export default function Dashboard() {
               </button>
               <button
                 className={styles.modalBtnDanger}
-                onClick={() => {
-                  setShowCancelModal(false);
-                  alert("Cancelled.");
-                }}
+                onClick={handleCancelSubscription}
               >
                 Cancel anyway
               </button>
@@ -621,7 +652,7 @@ function SubscriptionSection({ onCancel, user, stats }) {
           tier,
           email: user.email,
           name: user.name,
-          number: user.number,
+          number: user.phone,
         }),
         false,
       );
@@ -837,6 +868,8 @@ function AccountSection({ user }) {
   );
   const [phone, setPhone] = useState(user?.phone || "");
   const [saving, setSaving] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const saveProfile = async () => {
     setSaving(true);
@@ -852,6 +885,28 @@ function AccountSection({ user }) {
       );
 
       alert("Profile saved!");
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const changePassword = async () => {
+    if (newPassword !== confirmPassword) {
+      alert("Passwords do not match.");
+      return;
+    }
+    if (newPassword.length < 8) {
+      alert("Password must be at least 8 characters.");
+      return;
+    }
+    setSaving(true);
+    try {
+      await account.updatePassword(newPassword);
+      alert("Password updated!");
+      setNewPassword("");
+      setConfirmPassword("");
     } catch (err) {
       alert(err.message);
     } finally {
@@ -910,18 +965,30 @@ function AccountSection({ user }) {
         <div className={styles.card}>
           <div className={styles.cardTitle}>Change password</div>
           <div className={styles.fieldGroup}>
-            <label>Current password</label>
-            <input type="password" placeholder="Current password" />
-          </div>
-          <div className={styles.fieldGroup}>
             <label>New password</label>
-            <input type="password" placeholder="New password" />
+            <input
+              type="password"
+              placeholder="New password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+            />
           </div>
           <div className={styles.fieldGroup}>
             <label>Confirm new password</label>
-            <input type="password" placeholder="Confirm new password" />
+            <input
+              type="password"
+              placeholder="Confirm new password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+            />
           </div>
-          <button className={styles.btnPrimary}>Update password</button>
+          <button
+            className={styles.btnPrimary}
+            onClick={changePassword}
+            disabled={saving}
+          >
+            {saving ? "Saving..." : "Update password"}
+          </button>
         </div>
       </div>
     </div>

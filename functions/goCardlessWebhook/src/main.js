@@ -67,6 +67,28 @@ export default async ({ req, res, log, error }) => {
         const mandateId = event.links?.mandate;
         if (!mandateId) continue;
 
+        // Get mandate to find billing request metadata (landlordId, tier)
+        const mandateData = await gcRequest("GET", `/mandates/${mandateId}`);
+        const mandate = mandateData?.mandates;
+        if (!mandate) continue;
+
+        const metadata = mandate.metadata ?? {};
+        const landlordId = metadata.landlordId;
+        const tier = metadata.tier;
+
+        if (!landlordId) {
+          log(`No landlordId in mandate metadata for ${mandateId}`);
+          continue;
+        }
+
+        const TIER_CONFIG = {
+          tier3: { amount: 1599, maxProperties: 5 },
+          tier2: { amount: 2999, maxProperties: 15 },
+          tier1: { amount: 5999, maxProperties: 999 },
+        };
+
+        const tierConf = TIER_CONFIG[tier] ?? TIER_CONFIG.tier2;
+
         // After updating Appwrite, create the recurring subscription
         await gcRequest("POST", "/subscriptions", {
           subscriptions: {
@@ -85,28 +107,6 @@ export default async ({ req, res, log, error }) => {
           },
         });
 
-        // Get mandate to find billing request metadata (landlordId, tier)
-        const mandateData = await gcRequest("GET", `/mandates/${mandateId}`);
-        const mandate = mandateData?.mandates;
-        if (!mandate) continue;
-
-        const metadata = mandate.metadata ?? {};
-        const landlordId = metadata.landlordId;
-        const tier = metadata.tier;
-
-        if (!landlordId) {
-          log(`No landlordId in mandate metadata for ${mandateId}`);
-          continue;
-        }
-
-        const TIER_CONFIG = {
-          starter: { amount: 1599, maxProperties: 5 },
-          growth: { amount: 2999, maxProperties: 15 },
-          pro: { amount: 5999, maxProperties: 999 },
-        };
-
-        const tierConf = TIER_CONFIG[tier] ?? TIER_CONFIG.growth;
-
         // Update subscription to active
         const subRes = await databases.listDocuments(
           DATABASE_ID,
@@ -122,7 +122,7 @@ export default async ({ req, res, log, error }) => {
         const subUpdate = {
           status: "active",
           billingSource: "gocardless",
-          tier: tier ?? "growth",
+          tier: tier ?? "tier2",
           maxProperties: tierConf.maxProperties,
           monthlyCharge: tierConf.amount / 100,
           billingDate: now,
@@ -152,7 +152,7 @@ export default async ({ req, res, log, error }) => {
               DATABASE_ID,
               COLLECTION_USERS_ID,
               userRes.documents[0].$id,
-              { stripeCustomerId: customerId }, // reusing field for GC customer ID
+              { gcCustomerId: customerId },
             );
           }
         }
@@ -171,7 +171,7 @@ export default async ({ req, res, log, error }) => {
         if (!landlordId) continue;
 
         const periodEnd = new Date(
-          Date.now() + 14 * 24 * 60 * 60 * 1000,
+          Date.now() + 30 * 24 * 60 * 60 * 1000,
         ).toISOString();
 
         const subRes = await databases.listDocuments(
@@ -192,31 +192,40 @@ export default async ({ req, res, log, error }) => {
             },
           );
         }
-      }
-      // In goCardlessWebhook, after paid_out event
-      const propertiesRes = await databases.listDocuments(
-        DATABASE_ID,
-        "properties",
-        [Query.equal("landlordId", landlordId)],
-      );
-      const propertyCount = propertiesRes.total;
-      const recommendedTier =
-        propertyCount <= 5 ? "starter" : propertyCount <= 15 ? "growth" : "pro";
-      const currentTier = subRes.documents[0].tier;
 
-      if (recommendedTier !== currentTier) {
-        const newTierConf = TIER_CONFIG[recommendedTier];
-        await databases.updateDocument(
+        const TIER_CONFIG = {
+          tier3: { amount: 1599, maxProperties: 5 },
+          tier2: { amount: 2999, maxProperties: 15 },
+          tier1: { amount: 5999, maxProperties: 999 },
+        };
+
+        const propertiesRes = await databases.listDocuments(
           DATABASE_ID,
-          COLLECTION_SUBSCRIPTIONS_ID,
-          subRes.documents[0].$id,
-          {
-            tier: recommendedTier,
-            maxProperties: newTierConf.maxProperties,
-            monthlyCharge: newTierConf.amount / 100,
-          },
+          "properties",
+          [Query.equal("landlordId", landlordId)],
         );
-        // Optionally update the GoCardless subscription amount too
+        const propertyCount = propertiesRes.total;
+        const recommendedTier =
+          propertyCount <= 5
+            ? "tier3"
+            : propertyCount <= 15
+              ? "tier2"
+              : "tier1";
+        const currentTier = subRes.documents[0].tier;
+
+        if (recommendedTier !== currentTier) {
+          const newTierConf = TIER_CONFIG[recommendedTier];
+          await databases.updateDocument(
+            DATABASE_ID,
+            COLLECTION_SUBSCRIPTIONS_ID,
+            subRes.documents[0].$id,
+            {
+              tier: recommendedTier,
+              maxProperties: newTierConf.maxProperties,
+              monthlyCharge: newTierConf.amount / 100,
+            },
+          );
+        }
       }
 
       // Mandate cancelled = subscription lapsed

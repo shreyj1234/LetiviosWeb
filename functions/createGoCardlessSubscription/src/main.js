@@ -6,7 +6,6 @@ const {
   APPWRITE_API_KEY,
   DATABASE_ID,
   COLLECTION_SUBSCRIPTIONS_ID,
-  COLLECTION_USERS_ID,
   GOCARDLESS_ACCESS_TOKEN,
   GOCARDLESS_ENVIRONMENT, // "sandbox" or "live"
   APP_BASE_URL, // e.g. https://letivios.com
@@ -43,9 +42,9 @@ async function gcRequest(method, path, body) {
 
 // Tier config
 const TIER_CONFIG = {
-  starter: { amount: 1599, maxProperties: 5 },
-  growth: { amount: 2999, maxProperties: 15 },
-  pro: { amount: 5999, maxProperties: 999 },
+  tier3: { amount: 1599, maxProperties: 5 },
+  tier2: { amount: 2999, maxProperties: 15 },
+  tier1: { amount: 5999, maxProperties: 999 },
 };
 
 export default async ({ req, res, log, error }) => {
