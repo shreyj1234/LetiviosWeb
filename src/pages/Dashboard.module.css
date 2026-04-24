@@ -651,7 +651,7 @@
 .modalTitle {
   font-family: "DM Serif Display", serif;
   font-size: 22px;
-  color: var(--white);
+  color: #111827;
   margin-bottom: 8px;
 }
 .modalDesc {
@@ -824,17 +824,24 @@
   .subProps {
     grid-template-columns: 1fr 1fr;
   }
-  .planCardCurrent::after {
-    font-size: 8px;
-    padding: 2px 7px;
-    top: 10px;
-    right: 10px;
-  }
   .pageHeader h2 {
     color: #111827;
   }
   .pageHeader p {
     color: #6b7280;
+  }
+  .planCardCurrent::after {
+    display: none;
+  }
+  .planCardCurrent {
+    border-color: var(--border2) !important;
+    box-shadow: none;
+  }
+  .planCard {
+    padding: 18px 16px;
+  }
+  .planPriceLg {
+    font-size: 28px;
   }
 }
 
@@ -1012,7 +1019,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  box-shadow: #4f6ef7;
+  box-shadow: 0 0 20px rgba(79, 110, 247, 0.15);
 }
 @media (max-width: 600px) {
   .wDownloadBanner {
@@ -1083,7 +1090,7 @@
 .wBtnGoogle {
   background: #ffffff;
   color: #000000;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid #e5e7eb;
 }
 .wStoreBtnIcon {
   width: 14px;
