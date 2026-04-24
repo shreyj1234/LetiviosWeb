@@ -26,6 +26,7 @@ export default function Dashboard() {
   const [plan, setPlan] = useState("tier3");
   const [showSignOutModal, setShowSignOutModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const [stats, setStats] = useState({
     properties: 0,
@@ -90,75 +91,97 @@ export default function Dashboard() {
   return (
     <div className={styles.shell}>
       {/* ── Sidebar ── */}
-      <aside className={styles.sidebar}>
-        <a href="/" className={styles.sidebarLogo}>
-          <img src="/images/webIcon.png" style={{ height: 36 }} alt="" />
-          <img src="/images/title.png" style={{ height: 22 }} alt="" />
-        </a>
-
-        <div className={styles.navSectionLabel}>Overview</div>
+      <aside
+        className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarExpanded : ""}`}
+      >
         <button
-          className={`${styles.navItem} ${activeSection === "welcome" ? styles.navActive : ""}`}
-          onClick={() => setActiveSection("welcome")}
+          className={styles.hamburger}
+          onClick={() => setSidebarOpen((o) => !o)}
         >
-          <span>🏠</span> Dashboard
+          <span>{sidebarOpen ? "✕  Close" : "☰  Menu"}</span>
+          <img src="/images/webIcon.png" style={{ height: 28 }} alt="" />
         </button>
+        <div className={styles.sidebarNav}>
+          <a href="/" className={styles.sidebarLogo}>
+            <img src="/images/webIcon.png" style={{ height: 36 }} alt="" />
+            <img src="/images/title.png" style={{ height: 22 }} alt="" />
+          </a>
 
-        <div className={styles.navSectionLabel}>Manage</div>
-        <button className={`${styles.navItem} ${styles.navDisabled}`}>
-          <span>🏘️</span> Portfolio{" "}
-          <span className={styles.comingSoonBadge}>Soon</span>
-        </button>
-        <button className={`${styles.navItem} ${styles.navDisabled}`}>
-          <span>🔧</span> Jobs{" "}
-          <span className={styles.comingSoonBadge}>Soon</span>
-        </button>
-        <button className={`${styles.navItem} ${styles.navDisabled}`}>
-          <span>💬</span> Messages{" "}
-          <span className={styles.comingSoonBadge}>Soon</span>
-        </button>
-
-        <div className={styles.navSectionLabel}>Account</div>
-        <button
-          className={`${styles.navItem} ${activeSection === "subscription" ? styles.navActive : ""}`}
-          onClick={() => setActiveSection("subscription")}
-        >
-          <span>💳</span> Subscription
-        </button>
-        <button
-          className={`${styles.navItem} ${activeSection === "account" ? styles.navActive : ""}`}
-          onClick={() => setActiveSection("account")}
-        >
-          <span>👤</span> Account
-        </button>
-
-        <div className={styles.navSectionLabel}>App</div>
-        <button className={styles.navItem}>
-          <span>❓</span> Support
-        </button>
-
-        <div className={styles.sidebarSpacer} />
-
-        <div className={styles.sidebarUser}>
-          <div className={styles.userAvatar}>👤</div>
-          <div>
-            <div className={styles.userName}>{user?.name || "Loading..."}</div>
-            <div className={styles.userPlan}>{planLabels[plan]}</div>
-          </div>
+          <div className={styles.navSectionLabel}>Overview</div>
           <button
-            className={styles.signoutBtn}
-            onClick={() => setShowSignOutModal(true)}
+            className={`${styles.navItem} ${activeSection === "welcome" ? styles.navActive : ""}`}
+            onClick={() => {
+              setActiveSection("welcome");
+              setSidebarOpen(false);
+            }}
           >
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path
-                d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M11 11l3-3-3-3M14 8H6"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
+            <span>🏠</span> Dashboard
           </button>
+
+          <div className={styles.navSectionLabel}>Manage</div>
+          <button className={`${styles.navItem} ${styles.navDisabled}`}>
+            <span>🏘️</span> Portfolio{" "}
+            <span className={styles.comingSoonBadge}>Soon</span>
+          </button>
+          <button className={`${styles.navItem} ${styles.navDisabled}`}>
+            <span>🔧</span> Jobs{" "}
+            <span className={styles.comingSoonBadge}>Soon</span>
+          </button>
+          <button className={`${styles.navItem} ${styles.navDisabled}`}>
+            <span>💬</span> Messages{" "}
+            <span className={styles.comingSoonBadge}>Soon</span>
+          </button>
+
+          <div className={styles.navSectionLabel}>Account</div>
+          <button
+            className={`${styles.navItem} ${activeSection === "subscription" ? styles.navActive : ""}`}
+            onClick={() => {
+              setActiveSection("subscription");
+              setSidebarOpen(false);
+            }}
+          >
+            <span>💳</span> Subscription
+          </button>
+          <button
+            className={`${styles.navItem} ${activeSection === "account" ? styles.navActive : ""}`}
+            onClick={() => {
+              setActiveSection("account");
+              setSidebarOpen(false);
+            }}
+          >
+            <span>👤</span> Account
+          </button>
+
+          <div className={styles.navSectionLabel}>App</div>
+          <button className={styles.navItem}>
+            <span>❓</span> Support
+          </button>
+
+          <div className={styles.sidebarSpacer} />
+
+          <div className={styles.sidebarUser}>
+            <div className={styles.userAvatar}>👤</div>
+            <div>
+              <div className={styles.userName}>
+                {user?.name || "Loading..."}
+              </div>
+              <div className={styles.userPlan}>{planLabels[plan]}</div>
+            </div>
+            <button
+              className={styles.signoutBtn}
+              onClick={() => setShowSignOutModal(true)}
+            >
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                <path
+                  d="M6 2H3a1 1 0 00-1 1v10a1 1 0 001 1h3M11 11l3-3-3-3M14 8H6"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          </div>
         </div>
       </aside>
 
