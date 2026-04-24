@@ -89,7 +89,8 @@ export default function Dashboard() {
   const firstName = user?.name?.split(" ")[0] || "there";
 
   return (
-    <div className={styles.shell}>
+    <div className={styles.shell} style={{ overflow: "visible" }}>
+      {" "}
       {/* ── Sidebar ── */}
       <aside
         className={`${styles.sidebar} ${sidebarOpen ? styles.sidebarExpanded : ""}`}
@@ -184,7 +185,6 @@ export default function Dashboard() {
           </div>
         </div>
       </aside>
-
       {/* ── Main ── */}
       <main className={styles.main}>
         {activeSection === "welcome" && (
@@ -199,7 +199,6 @@ export default function Dashboard() {
         )}
         {activeSection === "account" && <AccountSection user={user} />}
       </main>
-
       {/* ── Sign-out modal ── */}
       {showSignOutModal && (
         <div
@@ -225,7 +224,6 @@ export default function Dashboard() {
           </div>
         </div>
       )}
-
       {/* ── Cancel-subscription modal ── */}
       {showCancelModal && (
         <div
