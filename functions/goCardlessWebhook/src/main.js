@@ -25,6 +25,12 @@ const GC_BASE =
     ? "https://api.gocardless.com"
     : "https://api-sandbox.gocardless.com";
 
+const TIER_CONFIG = {
+  tier3: { amount: 1599, maxProperties: 5 },
+  tier2: { amount: 2999, maxProperties: 15 },
+  tier1: { amount: 5999, maxProperties: 999 },
+};
+
 async function gcRequest(method, path, body) {
   const res = await fetch(`${GC_BASE}${path}`, {
     method,
@@ -62,34 +68,40 @@ export default async ({ req, res, log, error }) => {
     for (const event of events) {
       log(`GoCardless event: ${event.resource_type} ${event.action}`);
 
-      // Mandate created = direct debit authorised = subscription is now active
+      // ── Mandate created → activate subscription ──────────────────────────
       if (event.resource_type === "mandates" && event.action === "created") {
         const mandateId = event.links?.mandate;
         if (!mandateId) continue;
 
-        // Get mandate to find billing request metadata (landlordId, tier)
+        // Fetch mandate from GoCardless
         const mandateData = await gcRequest("GET", `/mandates/${mandateId}`);
         const mandate = mandateData?.mandates;
         if (!mandate) continue;
 
-        const metadata = mandate.metadata ?? {};
-        const landlordId = metadata.landlordId;
-        const tier = metadata.tier;
-
-        if (!landlordId) {
-          log(`No landlordId in mandate metadata for ${mandateId}`);
+        // Match to our subscription via billing request ID
+        const billingRequestId = mandate.links?.billing_request;
+        if (!billingRequestId) {
+          log(`No billing_request link on mandate ${mandateId}`);
           continue;
         }
 
-        const TIER_CONFIG = {
-          tier3: { amount: 1599, maxProperties: 5 },
-          tier2: { amount: 2999, maxProperties: 15 },
-          tier1: { amount: 5999, maxProperties: 999 },
-        };
+        const subRes = await databases.listDocuments(
+          DATABASE_ID,
+          COLLECTION_SUBSCRIPTIONS_ID,
+          [Query.equal("gcBillingRequestId", billingRequestId), Query.limit(1)],
+        );
 
-        const tierConf = TIER_CONFIG[tier] ?? TIER_CONFIG.tier2;
+        if (subRes.total === 0) {
+          log(`No subscription found for billing request ${billingRequestId}`);
+          continue;
+        }
 
-        // After updating Appwrite, create the recurring subscription
+        const existingSub = subRes.documents[0];
+        const landlordId = existingSub.landlordId;
+        const tier = existingSub.tier;
+        const tierConf = TIER_CONFIG[tier] ?? TIER_CONFIG.tier3;
+
+        // Create the recurring GoCardless subscription
         await gcRequest("POST", "/subscriptions", {
           subscriptions: {
             amount: tierConf.amount,
@@ -97,47 +109,32 @@ export default async ({ req, res, log, error }) => {
             name: `Letivios ${tier} Plan`,
             interval_unit: "monthly",
             day_of_month: -1,
-            links: {
-              mandate: mandateId,
-            },
-            metadata: {
-              landlordId,
-              tier,
-            },
+            links: { mandate: mandateId },
+            metadata: { landlordId, tier },
           },
         });
 
-        // Update subscription to active
-        const subRes = await databases.listDocuments(
-          DATABASE_ID,
-          COLLECTION_SUBSCRIPTIONS_ID,
-          [Query.equal("landlordId", landlordId), Query.limit(1)],
-        );
-
+        // Activate subscription in Appwrite
         const now = new Date().toISOString();
         const periodEnd = new Date(
-          Date.now() + 14 * 24 * 60 * 60 * 1000,
+          Date.now() + 30 * 24 * 60 * 60 * 1000,
         ).toISOString();
 
-        const subUpdate = {
-          status: "active",
-          billingSource: "gocardless",
-          tier: tier ?? "tier2",
-          maxProperties: tierConf.maxProperties,
-          monthlyCharge: tierConf.amount / 100,
-          billingDate: now,
-          currentPeriodEnd: periodEnd,
-          gcMandateId: mandateId,
-        };
-
-        if (subRes.total > 0) {
-          await databases.updateDocument(
-            DATABASE_ID,
-            COLLECTION_SUBSCRIPTIONS_ID,
-            subRes.documents[0].$id,
-            subUpdate,
-          );
-        }
+        await databases.updateDocument(
+          DATABASE_ID,
+          COLLECTION_SUBSCRIPTIONS_ID,
+          existingSub.$id,
+          {
+            status: "active",
+            billingSource: "gocardless",
+            tier,
+            maxProperties: tierConf.maxProperties,
+            monthlyCharge: tierConf.amount / 100,
+            billingDate: now,
+            currentPeriodEnd: periodEnd,
+            gcMandateId: mandateId,
+          },
+        );
 
         // Update user record with GC customer ID
         const customerId = mandate.links?.customer;
@@ -160,8 +157,8 @@ export default async ({ req, res, log, error }) => {
         log(`Activated subscription for landlord ${landlordId}`);
       }
 
-      // Payment paid = renew period
-      if (event.resource_type === "payments" && event.action === "paid_out") {
+      // ── Payment confirmed → renew period ────────────────────────────────
+      if (event.resource_type === "payments" && event.action === "confirmed") {
         const paymentId = event.links?.payment;
         if (!paymentId) continue;
 
@@ -180,25 +177,20 @@ export default async ({ req, res, log, error }) => {
           [Query.equal("landlordId", landlordId), Query.limit(1)],
         );
 
-        if (subRes.total > 0) {
-          await databases.updateDocument(
-            DATABASE_ID,
-            COLLECTION_SUBSCRIPTIONS_ID,
-            subRes.documents[0].$id,
-            {
-              status: "active",
-              currentPeriodEnd: periodEnd,
-              paymentDate: new Date().toISOString(),
-            },
-          );
-        }
+        if (subRes.total === 0) continue;
 
-        const TIER_CONFIG = {
-          tier3: { amount: 1599, maxProperties: 5 },
-          tier2: { amount: 2999, maxProperties: 15 },
-          tier1: { amount: 5999, maxProperties: 999 },
-        };
+        await databases.updateDocument(
+          DATABASE_ID,
+          COLLECTION_SUBSCRIPTIONS_ID,
+          subRes.documents[0].$id,
+          {
+            status: "active",
+            currentPeriodEnd: periodEnd,
+            paymentDate: new Date().toISOString(),
+          },
+        );
 
+        // Auto-adjust tier based on property count
         const propertiesRes = await databases.listDocuments(
           DATABASE_ID,
           "properties",
@@ -228,20 +220,18 @@ export default async ({ req, res, log, error }) => {
         }
       }
 
-      // Mandate cancelled = subscription lapsed
+      // ── Mandate cancelled/expired → lapse subscription ──────────────────
       if (
         event.resource_type === "mandates" &&
         (event.action === "cancelled" || event.action === "expired")
       ) {
         const mandateId = event.links?.mandate;
-        const mandateData = await gcRequest("GET", `/mandates/${mandateId}`);
-        const landlordId = mandateData?.mandates?.metadata?.landlordId;
-        if (!landlordId) continue;
+        if (!mandateId) continue;
 
         const subRes = await databases.listDocuments(
           DATABASE_ID,
           COLLECTION_SUBSCRIPTIONS_ID,
-          [Query.equal("landlordId", landlordId), Query.limit(1)],
+          [Query.equal("gcMandateId", mandateId), Query.limit(1)],
         );
 
         if (subRes.total > 0) {
