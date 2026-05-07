@@ -641,8 +641,11 @@ function SubscriptionSection({ onCancel, user, stats }) {
       })
     : null;
 
+  /*   const handleSubscribe = async (tier) => {
+    if (!user || isInTrial) return; */
+
   const handleSubscribe = async (tier) => {
-    if (!user || isInTrial) return;
+    if (!user) return;
     setLoading(true);
     try {
       const functions = new Functions(client);

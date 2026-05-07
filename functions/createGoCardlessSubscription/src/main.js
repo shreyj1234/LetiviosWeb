@@ -68,7 +68,7 @@ export default async ({ req, res, log, error }) => {
     const daysSinceRegistration =
       (Date.now() - registeredAt) / (1000 * 60 * 60 * 24);
 
-    if (daysSinceRegistration < 14) {
+    /*     if (daysSinceRegistration < 14) {
       const daysLeft = Math.ceil(14 - daysSinceRegistration);
       return res.json(
         {
@@ -77,7 +77,7 @@ export default async ({ req, res, log, error }) => {
         },
         400,
       );
-    }
+    } */
 
     // Still read tier/email/name from body — these are non-sensitive
     const body =

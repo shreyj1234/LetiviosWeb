@@ -46,8 +46,9 @@ export default function Auth() {
       );
       navigate("/dashboard");
     } catch (err) {
-      setLoading(false);
       showError(err.message || "Invalid email or password.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -73,14 +74,12 @@ export default function Auth() {
         `${firstName} ${lastName}`,
       );
       await account.createEmailPasswordSession(email, password);
-      await account.updatePrefs({ plan: selectedPlan });
       await account.updatePrefs({ plan: selectedPlan, role: "landlord" });
 
-      // Write user to database
       await databases.createDocument(
         import.meta.env.VITE_APPWRITE_DATABASE_ID,
         "users",
-        newAccount.$id, // use same ID as auth account
+        newAccount.$id,
         {
           name: `${firstName} ${lastName}`,
           email: email,
@@ -90,10 +89,25 @@ export default function Auth() {
         },
       );
 
-      navigate("/dashboard");
+      await databases.createDocument(
+        import.meta.env.VITE_APPWRITE_DATABASE_ID,
+        "subscriptions",
+        ID.unique(),
+        {
+          landlordId: newAccount.$id,
+          status: "trial",
+          trialStartDate: new Date().toISOString(),
+        },
+      );
+      await account.createVerification(
+        `${window.location.origin}/verify-email`,
+      );
+
+      navigate("/verify-email");
     } catch (err) {
-      setLoading(false);
       showError(err.message || "Something went wrong.");
+    } finally {
+      setLoading(false);
     }
   };
 

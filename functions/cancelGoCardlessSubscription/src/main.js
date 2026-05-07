@@ -41,13 +41,36 @@ async function gcRequest(method, path, body) {
 
 export default async ({ req, res, log, error }) => {
   try {
-    // 1. Parse body
+    // 1. Auth check
+    const jwt = req.headers?.["x-appwrite-user-jwt"];
+    if (!jwt) return res.json({ ok: false, message: "Unauthorised." }, 401);
+
+    const payload = JSON.parse(
+      Buffer.from(jwt.split(".")[1], "base64").toString(),
+    );
+    const landlordId = payload.userId;
+
+    // 2. Parse body
     const body =
       typeof req.body === "string" ? JSON.parse(req.body) : (req.body ?? {});
     const { mandateId } = body;
 
     if (!mandateId) {
       return res.json({ ok: false, message: "mandateId is required." }, 400);
+    }
+
+    // 3. Verify mandate belongs to this user
+    const ownerCheck = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTION_SUBSCRIPTIONS_ID,
+      [Query.equal("gcMandateId", mandateId), Query.limit(1)],
+    );
+
+    if (
+      ownerCheck.total === 0 ||
+      ownerCheck.documents[0].landlordId !== landlordId
+    ) {
+      return res.json({ ok: false, message: "Unauthorised." }, 401);
     }
 
     // 2. Cancel the mandate in GoCardless
@@ -57,24 +80,14 @@ export default async ({ req, res, log, error }) => {
 
     log(`Cancelled GoCardless mandate ${mandateId}`);
 
-    // 3. Update subscription status in Appwrite
-    const subRes = await databases.listDocuments(
+    // 3. Update subscription status in Appwrite (reuse ownerCheck result)
+    await databases.updateDocument(
       DATABASE_ID,
       COLLECTION_SUBSCRIPTIONS_ID,
-      [Query.equal("gcMandateId", mandateId), Query.limit(1)],
+      ownerCheck.documents[0].$id,
+      { status: "cancelled" },
     );
-
-    if (subRes.total > 0) {
-      await databases.updateDocument(
-        DATABASE_ID,
-        COLLECTION_SUBSCRIPTIONS_ID,
-        subRes.documents[0].$id,
-        { status: "cancelled" },
-      );
-      log(`Updated subscription to cancelled for mandate ${mandateId}`);
-    } else {
-      log(`No subscription found for mandate ${mandateId}`);
-    }
+    log(`Updated subscription to cancelled for mandate ${mandateId}`);
 
     return res.json({ ok: true });
   } catch (err) {
