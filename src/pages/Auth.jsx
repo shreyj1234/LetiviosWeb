@@ -45,13 +45,46 @@ export default function Auth() {
       );
 
       const user = await account.get();
+
       if (!user.emailVerification) {
-        // Resend verification and block access
         await account.createVerification(
           `${window.location.origin}/verify-email`,
         );
         navigate("/verify-email");
         return;
+      }
+
+      // First sign-in after verification — create DB documents if needed
+      const prefs = user.prefs;
+      if (prefs.pendingSetup) {
+        const planLimits = { tier3: 5, tier2: 15, tier1: null };
+
+        await databases.createDocument(
+          import.meta.env.VITE_APPWRITE_DATABASE_ID,
+          "users",
+          user.$id,
+          {
+            name: user.name,
+            email: user.email,
+            role: "landlord",
+            webAuthEnabled: false,
+            onboardingComplete: false,
+            maxProperties: planLimits[prefs.plan] ?? null,
+          },
+        );
+
+        await databases.createDocument(
+          import.meta.env.VITE_APPWRITE_DATABASE_ID,
+          "subscriptions",
+          ID.unique(),
+          {
+            landlordId: user.$id,
+            status: "trial",
+            trialStartDate: new Date().toISOString(),
+          },
+        );
+
+        await account.updatePrefs({ ...prefs, pendingSetup: false });
       }
 
       navigate("/dashboard");
