@@ -102,14 +102,15 @@ export default function Home() {
                 <br />
                 tenants, and payments
                 <br />
-                <em>all in one place.</em>
+                <em>all on one platform.</em>
               </h1>
               <p
                 className={`${styles.heroSub} ${styles.reveal} ${styles.heroReveal} ${styles.delay2}`}
               >
-                Letivios brings landlords, tenants, and contractors together in
-                one simple platform — from rent tracking to maintenance, all in
-                one place.
+                Letivios is a management and tracking platform — not a signing
+                tool. Documents are stored and shared, payments are tracked and
+                confirmed, jobs are logged and monitored. Everything in one
+                place, for everyone involved.
               </p>
               <div
                 className={`${styles.heroActions} ${styles.reveal} ${styles.heroReveal} ${styles.delay3}`}
@@ -134,25 +135,32 @@ export default function Home() {
                 No credit card required · Cancel anytime
               </p>
               <div
-                className={`${styles.heroStats} ${styles.reveal} ${styles.heroReveal} ${styles.delay4}`}
+                className={`${styles.heroReplacesWrap} ${styles.reveal} ${styles.heroReveal} ${styles.delay4}`}
               >
-                <div className={styles.statItem}>
-                  <div className={styles.statValue}>One dashboard</div>
-                  <div className={styles.statLabel}>Full control</div>
-                </div>
-                <div className={styles.statItem}>
-                  <div className={styles.statValue}>14 days</div>
-                  <div className={styles.statLabel}>Free trial</div>
-                </div>
-                <div className={styles.statItem}>
-                  <div className={styles.statValue}>£0</div>
-                  <div className={styles.statLabel}>Setup fee</div>
+                <p className={styles.replacesLabel}>
+                  Replaces your current tools
+                </p>
+                <div className={styles.heroReplaces}>
+                  {[
+                    ["WhatsApp groups", "In-app messaging"],
+                    ["Excel spreadsheets", "Payment tracking"],
+                    ["Email attachments", "Document storage"],
+                    ["Phone calls", "Maintenance jobs"],
+                    ["Paper notices", "Digital records"],
+                  ].map(([before, after]) => (
+                    <div key={before} className={styles.heroReplacesItem}>
+                      <span className={styles.replacesBefore}>{before}</span>
+                      <span className={styles.replacesArrow}>→</span>
+                      <span className={styles.replacesAfter}>{after}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
               <p
                 className={`${styles.heroNote} ${styles.reveal} ${styles.heroReveal} ${styles.delay5}`}
               >
-                Available on iOS & Android · Web version launching soon
+                Available on iOS & Android · Only landlords pay — tenants &
+                contractors are free{" "}
               </p>
             </div>
 
@@ -312,39 +320,39 @@ export default function Home() {
             {[
               {
                 icon: "🏠",
-                title: "Property Portfolio",
-                desc: "Manage every property in one dashboard. Track occupancy, lease dates, rent amounts, and deposit status at a glance.",
+                title: "Portfolio Management",
+                desc: "Monitor occupancy, lease dates, rent amounts, deposit status and key safe codes at a glance.",
                 tag: "Landlord",
               },
               {
-                icon: "👥",
-                title: "Multi-Tenant HMOs",
-                desc: "Full support for houses of multiple occupation. Each tenant gets their own lease terms, payment tracking, and notice period.",
-                tag: "HMO Ready",
+                icon: "🗓️",
+                title: "Calendar & Viewings",
+                desc: "Track inspections, contractor visits, viewings and other property events in one calendar. All parties see what's relevant to them.",
+                tag: "All roles",
+              },
+              {
+                icon: "💬",
+                title: "In-App Messaging",
+                desc: "Direct messaging between landlords, tenants, and contractors. Job-linked threads keep conversations in context. No more lost WhatsApp messages.",
+                tag: "All roles",
               },
               {
                 icon: "💸",
                 title: "Payment Tracking",
-                desc: "Tenants notify you when they've paid. Confirm receipt in one tap. Full payment history with overdue alerts built in.",
+                desc: "Tenants notify you when rent is sent. Landlords confirm receipt in one tap. Full payment history with overdue alerts — no actual payments processed.",
                 tag: "Landlord + Tenant",
               },
               {
                 icon: "🔧",
-                title: "Contractor Network",
-                desc: "Save trusted contractors, assign jobs, share key safe codes securely. Full job history and photo evidence.",
-                tag: "Maintenance",
+                title: "Job Management",
+                desc: "Log maintenance jobs, assign contractors, track progress and view completion photos. Tenants are notified when a contractor is scheduled.",
+                tag: "All roles",
               },
               {
                 icon: "📁",
                 title: "Document Storage",
                 desc: "Tenancy agreements, guarantor docs, gas certificates — all stored securely. Mutual consent required for any deletion.",
-                tag: "Secure",
-              },
-              {
-                icon: "💬",
-                title: "In-App Messaging",
-                desc: "Direct messaging between landlords, tenants, and contractors. No more lost WhatsApp threads or missed emails.",
-                tag: "Communication",
+                tag: "Landlord + Tenant",
               },
             ].map((f, i) => (
               <div

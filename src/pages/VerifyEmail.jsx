@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
+import { ID } from "appwrite";
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { account } from "../lib/appwrite";
-import styles from "./VerifyEmail.module.css"; // ← ADD THIS
+import { databases, account } from "../lib/appwrite";
+import styles from "./VerifyEmail.module.css";
 
 export default function VerifyEmail() {
   const [searchParams] = useSearchParams();
@@ -12,16 +13,56 @@ export default function VerifyEmail() {
     const userId = searchParams.get("userId");
     const secret = searchParams.get("secret");
 
-    if (userId && secret) {
+    if (!userId || !secret) return;
+
+    const completeVerification = async () => {
       setStatus("verifying");
-      account
-        .updateVerification(userId, secret)
-        .then(() => {
-          setStatus("success");
-          setTimeout(() => navigate("/dashboard"), 2000);
-        })
-        .catch(() => setStatus("error"));
-    }
+      try {
+        await account.updateVerification(userId, secret);
+
+        const user = await account.get();
+        const prefs = user.prefs;
+
+        if (prefs.pendingSetup) {
+          const planLimits = { tier3: 5, tier2: 15, tier1: null };
+
+          await databases.createDocument(
+            import.meta.env.VITE_APPWRITE_DATABASE_ID,
+            "users",
+            user.$id,
+            {
+              name: user.name,
+              email: user.email,
+              role: "landlord",
+              webAuthEnabled: false,
+              onboardingComplete: false,
+              maxProperties: planLimits[prefs.plan] ?? null,
+            },
+          );
+
+          await databases.createDocument(
+            import.meta.env.VITE_APPWRITE_DATABASE_ID,
+            "subscriptions",
+            ID.unique(),
+            {
+              landlordId: user.$id,
+              status: "trial",
+              trialStartDate: new Date().toISOString(),
+            },
+          );
+
+          await account.updatePrefs({ ...prefs, pendingSetup: false });
+        }
+
+        setStatus("success");
+        setTimeout(() => navigate("/dashboard"), 2000);
+      } catch (err) {
+        console.error(err);
+        setStatus("error");
+      }
+    };
+
+    completeVerification();
   }, []);
 
   return (

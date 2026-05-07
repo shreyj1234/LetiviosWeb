@@ -36,7 +36,6 @@ export default function Auth() {
     }
     setLoading(true);
     try {
-      // Delete any existing session first
       try {
         await account.deleteSession("current");
       } catch {}
@@ -44,6 +43,17 @@ export default function Auth() {
         signInForm.email,
         signInForm.password,
       );
+
+      const user = await account.get();
+      if (!user.emailVerification) {
+        // Resend verification and block access
+        await account.createVerification(
+          `${window.location.origin}/verify-email`,
+        );
+        navigate("/verify-email");
+        return;
+      }
+
       navigate("/dashboard");
     } catch (err) {
       showError(err.message || "Invalid email or password.");
@@ -62,11 +72,13 @@ export default function Auth() {
       return showError("Password must be at least 8 characters.");
     if (password !== confirmPassword)
       return showError("Passwords do not match.");
+
     setLoading(true);
     try {
       try {
         await account.deleteSession("current");
       } catch {}
+
       const newAccount = await account.create(
         ID.unique(),
         email,
@@ -74,35 +86,17 @@ export default function Auth() {
         `${firstName} ${lastName}`,
       );
       await account.createEmailPasswordSession(email, password);
-      await account.updatePrefs({ plan: selectedPlan, role: "landlord" });
 
-      await databases.createDocument(
-        import.meta.env.VITE_APPWRITE_DATABASE_ID,
-        "users",
-        newAccount.$id,
-        {
-          name: `${firstName} ${lastName}`,
-          email: email,
-          role: "landlord",
-          webAuthEnabled: false,
-          onboardingComplete: false,
-        },
-      );
+      // Store everything needed for post-verification setup
+      await account.updatePrefs({
+        plan: selectedPlan,
+        role: "landlord",
+        pendingSetup: true,
+      });
 
-      await databases.createDocument(
-        import.meta.env.VITE_APPWRITE_DATABASE_ID,
-        "subscriptions",
-        ID.unique(),
-        {
-          landlordId: newAccount.$id,
-          status: "trial",
-          trialStartDate: new Date().toISOString(),
-        },
-      );
       await account.createVerification(
         `${window.location.origin}/verify-email`,
       );
-
       navigate("/verify-email");
     } catch (err) {
       showError(err.message || "Something went wrong.");
