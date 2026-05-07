@@ -19,7 +19,20 @@ export default function VerifyEmail() {
       setStatus("verifying");
       try {
         await account.updateVerification(userId, secret);
+      } catch (err) {
+        try {
+          const user = await account.get();
+          if (!user.emailVerification) {
+            setStatus("error");
+            return;
+          }
+        } catch {
+          setStatus("error");
+          return;
+        }
+      }
 
+      try {
         const user = await account.get();
         const prefs = user.prefs;
 
