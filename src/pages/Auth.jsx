@@ -69,7 +69,7 @@ export default function Auth() {
             role: "landlord",
             webAuthEnabled: false,
             onboardingComplete: false,
-            maxProperties: planLimits[prefs.plan] ?? null,
+            maxProperties: null,
           },
         );
 
@@ -122,7 +122,6 @@ export default function Auth() {
 
       // Store everything needed for post-verification setup
       await account.updatePrefs({
-        plan: selectedPlan,
         role: "landlord",
         pendingSetup: true,
       });
@@ -356,25 +355,6 @@ export default function Auth() {
                       <AiOutlineEye size={22} color="#9CA3AF" />
                     )}{" "}
                   </button>
-                </div>
-              </div>
-              <div className={styles.field}>
-                <label>Choose your plan</label>
-                <div className={styles.planGrid}>
-                  {plans.map((plan) => (
-                    <div
-                      key={plan.id}
-                      className={`${styles.planOption} ${selectedPlan === plan.id ? styles.planSelected : ""}`}
-                      onClick={() => setSelectedPlan(plan.id)}
-                    >
-                      <div className={styles.planName}>{plan.name} </div>
-                      <div className={styles.planPrice}>
-                        {plan.price}
-                        <span>/mo</span>
-                      </div>
-                      <div className={styles.planProps}>{plan.props}</div>
-                    </div>
-                  ))}
                 </div>
               </div>
               <p className={styles.fieldHintTerms}>
