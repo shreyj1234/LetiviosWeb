@@ -49,7 +49,11 @@ const TIER_CONFIG = {
 
 export default async ({ req, res, log, error }) => {
   try {
-    const jwt = req.headers?.["x-appwrite-user-jwt"];
+    const body =
+      typeof req.body === "string" ? JSON.parse(req.body) : (req.body ?? {});
+    log("body keys: " + Object.keys(body).join(", "));
+    log("jwt present: " + !!body.jwt);
+    const jwt = req.headers?.["x-appwrite-user-jwt"] ?? body.jwt;
     if (!jwt) {
       return res.json({ ok: false, message: "Unauthorised." }, 401);
     }
@@ -58,31 +62,28 @@ export default async ({ req, res, log, error }) => {
     const payload = JSON.parse(
       Buffer.from(jwt.split(".")[1], "base64").toString(),
     );
-    const landlordId = payload.userId;
+    const landlordId = payload.sub ?? payload.userId;
 
-    // Check account age
-    const { Users } = await import("node-appwrite");
-    const users = new Users(client);
-    const userData = await users.get(landlordId);
-    const registeredAt = new Date(userData.registration * 1000);
-    const daysSinceRegistration =
-      (Date.now() - registeredAt) / (1000 * 60 * 60 * 24);
+    // Calculate when trial ends to set correct period start
+    const trialSubRes = await databases.listDocuments(
+      DATABASE_ID,
+      COLLECTION_SUBSCRIPTIONS_ID,
+      [Query.equal("landlordId", landlordId), Query.limit(1)],
+    );
 
-    /*     if (daysSinceRegistration < 14) {
-      const daysLeft = Math.ceil(14 - daysSinceRegistration);
-      return res.json(
-        {
-          ok: false,
-          message: `Your free trial is active for ${daysLeft} more days. You can subscribe after your trial ends.`,
-        },
-        400,
-      );
-    } */
+    const trialStartDate =
+      trialSubRes.total > 0
+        ? new Date(trialSubRes.documents[0].trialStartDate)
+        : new Date();
 
-    // Still read tier/email/name from body — these are non-sensitive
-    const body =
-      typeof req.body === "string" ? JSON.parse(req.body) : (req.body ?? {});
+    const trialEndDate = new Date(
+      trialStartDate.getTime() + 14 * 24 * 60 * 60 * 1000,
+    );
+    const firstChargeDate =
+      trialEndDate > new Date() ? trialEndDate : new Date();
+
     const { tier, email, name } = body;
+
     // ─────────────────────────────────────────────────────────────
 
     if (!landlordId || !tier || !email) {
@@ -110,6 +111,11 @@ export default async ({ req, res, log, error }) => {
         },
       },
     });
+
+    log(
+      "billingRequest id: " +
+        (billingRequest?.billing_requests?.id ?? "MISSING"),
+    );
 
     const brId = billingRequest.billing_requests.id;
 
@@ -141,15 +147,15 @@ export default async ({ req, res, log, error }) => {
     const now = new Date().toISOString();
     const subData = {
       landlordId,
-      status: "trial", // stays trial until webhook confirms
+      status: "pending_mandate",
       billingSource: "gocardless",
       tier,
       maxProperties: tierConf.maxProperties,
       currentPeriodEnd: new Date(
-        Date.now() + 14 * 24 * 60 * 60 * 1000,
+        firstChargeDate.getTime() + 30 * 24 * 60 * 60 * 1000,
       ).toISOString(),
       monthlyCharge: tierConf.amount / 100,
-      gcBillingRequestId: brId, // store so webhook can match
+      gcBillingRequestId: brId,
     };
 
     if (subRes.total === 0) {
@@ -167,6 +173,9 @@ export default async ({ req, res, log, error }) => {
         subData,
       );
     }
+
+    log("returning hostedUrl: " + hostedUrl);
+    return res.json({ ok: true, hostedUrl });
 
     return res.json({ ok: true, hostedUrl });
   } catch (err) {
