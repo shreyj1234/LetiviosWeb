@@ -156,6 +156,7 @@ export default async ({ req, res, log, error }) => {
       ).toISOString(),
       monthlyCharge: tierConf.amount / 100,
       gcBillingRequestId: brId,
+      gcMandateId: null,
     };
 
     if (subRes.total === 0) {
