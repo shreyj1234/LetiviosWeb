@@ -22,6 +22,7 @@ export default function Auth() {
     email: "",
     password: "",
     confirmPassword: "",
+    promoCode: "",
   });
 
   const showError = (msg) => {
@@ -81,6 +82,7 @@ export default function Auth() {
             landlordId: user.$id,
             status: "trial",
             trialStartDate: new Date().toISOString(),
+            trialDays: prefs.trialDays ?? 14,
           },
         );
 
@@ -96,7 +98,7 @@ export default function Auth() {
   };
 
   const handleSignUp = async () => {
-    const { firstName, lastName, email, password, confirmPassword } =
+    const { firstName, lastName, email, password, confirmPassword, promoCode } =
       signUpForm;
     if (!firstName || !lastName)
       return showError("Please enter your full name.");
@@ -105,6 +107,13 @@ export default function Auth() {
       return showError("Password must be at least 8 characters.");
     if (password !== confirmPassword)
       return showError("Passwords do not match.");
+
+    const VALID_PROMO_CODES = { EARLYBIRD: 60 };
+    const appliedPromo = promoCode.trim().toUpperCase();
+
+    if (appliedPromo && !VALID_PROMO_CODES[appliedPromo]) {
+      return showError("Invalid promotional code.");
+    }
 
     setLoading(true);
     try {
@@ -124,6 +133,8 @@ export default function Auth() {
       await account.updatePrefs({
         role: "landlord",
         pendingSetup: true,
+        promoCode: appliedPromo || null,
+        trialDays: appliedPromo ? VALID_PROMO_CODES[appliedPromo] : 14,
       });
 
       await account.createVerification(
@@ -357,6 +368,27 @@ export default function Auth() {
                   </button>
                 </div>
               </div>
+
+              <div className={styles.field}>
+                <label>
+                  Promotional code{" "}
+                  <span style={{ color: "#9CA3AF", fontWeight: 400 }}>
+                    (optional)
+                  </span>
+                </label>
+                <input
+                  type="text"
+                  placeholder="Enter code"
+                  value={signUpForm.promoCode}
+                  onChange={(e) =>
+                    setSignUpForm({
+                      ...signUpForm,
+                      promoCode: e.target.value.toUpperCase(),
+                    })
+                  }
+                />
+              </div>
+
               <p className={styles.fieldHintTerms}>
                 By creating an account you agree to Letivios's{" "}
                 <a href="/terms" className={styles.fieldHintLink}>

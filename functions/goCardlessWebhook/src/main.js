@@ -73,15 +73,10 @@ export default async ({ req, res, log, error }) => {
         const mandateId = event.links?.mandate;
         if (!mandateId) continue;
 
-        // Fetch mandate from GoCardless
-        const mandateData = await gcRequest("GET", `/mandates/${mandateId}`);
-        const mandate = mandateData?.mandates;
-        if (!mandate) continue;
-
-        // Match to our subscription via billing request ID
-        const billingRequestId = mandate.links?.billing_request;
+        // Get billing_request ID directly from the event links
+        const billingRequestId = event.links?.billing_request;
         if (!billingRequestId) {
-          log(`No billing_request link on mandate ${mandateId}`);
+          log(`No billing_request link on event for mandate ${mandateId}`);
           continue;
         }
 
@@ -101,6 +96,15 @@ export default async ({ req, res, log, error }) => {
         const tier = existingSub.tier;
         const tierConf = TIER_CONFIG[tier] ?? TIER_CONFIG.tier3;
 
+        const trialStart = new Date(existingSub.trialStartDate);
+        const trialEnd = new Date(
+          trialStart.getTime() + 14 * 24 * 60 * 60 * 1000,
+        );
+        const chargeDate =
+          trialEnd > new Date()
+            ? trialEnd.toISOString().split("T")[0] // YYYY-MM-DD format
+            : new Date().toISOString().split("T")[0];
+
         // Create the recurring GoCardless subscription
         await gcRequest("POST", "/subscriptions", {
           subscriptions: {
@@ -109,6 +113,7 @@ export default async ({ req, res, log, error }) => {
             name: `Letivios ${tier} Plan`,
             interval_unit: "monthly",
             day_of_month: -1,
+            start_date: chargeDate,
             links: { mandate: mandateId },
             metadata: { landlordId, tier },
           },
@@ -136,23 +141,7 @@ export default async ({ req, res, log, error }) => {
           },
         );
 
-        // Update user record with GC customer ID
-        const customerId = mandate.links?.customer;
-        if (customerId) {
-          const userRes = await databases.listDocuments(
-            DATABASE_ID,
-            COLLECTION_USERS_ID,
-            [Query.equal("$id", landlordId), Query.limit(1)],
-          );
-          if (userRes.total > 0) {
-            await databases.updateDocument(
-              DATABASE_ID,
-              COLLECTION_USERS_ID,
-              userRes.documents[0].$id,
-              { gcCustomerId: customerId },
-            );
-          }
-        }
+        // gcCustomerId update removed — mandate no longer fetched from GC API
 
         log(`Activated subscription for landlord ${landlordId}`);
       }

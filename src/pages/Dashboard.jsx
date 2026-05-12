@@ -15,7 +15,7 @@ const TIER_CONFIG = {
 function getRecommendedTier(propertyCount) {
   if (propertyCount <= 5) return "tier3";
   if (propertyCount <= 15) return "tier2";
-  return "tier3";
+  return "tier1";
 }
 
 // ─── Dashboard (root) ────────────────────────────────────────────────────────
@@ -30,9 +30,9 @@ export default function Dashboard() {
 
   const [stats, setStats] = useState({
     properties: 0,
-    tenants: 0,
+    tenancies: 0,
     jobs: 0,
-    trialDaysLeft: 14,
+    trialDaysLeft: null,
   });
 
   useEffect(() => {
@@ -56,11 +56,11 @@ export default function Dashboard() {
       .catch(() => {});
 
     databases
-      .listDocuments(dbId, "tenants", [
+      .listDocuments(dbId, "tenancies", [
         Query.equal("landlordId", user.$id),
         Query.equal("status", "active"),
       ])
-      .then((r) => setStats((s) => ({ ...s, tenants: r.total })))
+      .then((r) => setStats((s) => ({ ...s, tenancies: r.total })))
       .catch(() => {});
 
     databases
@@ -68,10 +68,31 @@ export default function Dashboard() {
       .then((r) => setStats((s) => ({ ...s, jobs: r.total })))
       .catch(() => {});
 
-    const created = new Date(user.$createdAt);
-    const daysUsed = Math.floor((Date.now() - created) / (1000 * 60 * 60 * 24));
-    const daysLeft = Math.max(0, 14 - daysUsed);
-    setStats((s) => ({ ...s, trialDaysLeft: daysLeft }));
+    databases
+      .listDocuments(dbId, "subscriptions", [
+        Query.equal("landlordId", user.$id),
+        Query.limit(1),
+      ])
+      .then((res) => {
+        if (res.documents.length > 0) {
+          const trialStart = new Date(res.documents[0].trialStartDate);
+          const daysUsed = Math.floor(
+            (Date.now() - trialStart) / (1000 * 60 * 60 * 24),
+          );
+          const trialLength = res.documents[0].trialDays ?? 14;
+          const daysLeft = Math.max(0, trialLength - daysUsed);
+          setStats((s) => ({ ...s, trialDaysLeft: daysLeft }));
+        } else {
+          // No subscription doc yet — fall back to account creation date
+          const created = new Date(user.$createdAt);
+          const daysUsed = Math.floor(
+            (Date.now() - created) / (1000 * 60 * 60 * 24),
+          );
+          const daysLeft = Math.max(0, 14 - daysUsed);
+          setStats((s) => ({ ...s, trialDaysLeft: daysLeft }));
+        }
+      })
+      .catch(() => {});
   }, [user]);
 
   const handleSignOut = async () => {
@@ -99,12 +120,11 @@ export default function Dashboard() {
         alert("No Direct Debit mandate found.");
         return;
       }
-      // Call your cancel Appwrite function
-      const { Functions } = await import("appwrite");
+      const jwt = await account.createJWT(); // ← add this
       const functions = new Functions(client);
       await functions.createExecution(
         import.meta.env.VITE_FUNCTION_CANCEL_GC_SUBSCRIPTION_ID,
-        JSON.stringify({ mandateId: gcMandateId }),
+        JSON.stringify({ mandateId: gcMandateId, jwt: jwt.jwt }), // ← add jwt here
         false,
       );
       alert(
@@ -315,8 +335,8 @@ function WelcomeSection({ firstName, stats }) {
       ),
     },
     {
-      value: stats.tenants.toString(),
-      label: "Active tenants",
+      value: stats.tenancies.toString(),
+      label: "Active tenancies",
       icon: (
         <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
           <circle cx="8" cy="6" r="3" stroke="currentColor" strokeWidth="1.5" />
@@ -357,28 +377,36 @@ function WelcomeSection({ firstName, stats }) {
         </svg>
       ),
     },
-    {
-      value: stats.trialDaysLeft.toString(),
-      label: "Trial days left",
-      icon: (
-        <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle
-            cx="10"
-            cy="10"
-            r="8"
-            stroke="currentColor"
-            strokeWidth="1.5"
-          />
-          <path
-            d="M10 6v4l2.5 2.5"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      ),
-    },
+    ...(stats.trialDaysLeft > 0
+      ? [
+          {
+            value: stats.trialDaysLeft.toString(),
+            label: "Trial days left",
+            icon: (
+              <svg
+                viewBox="0 0 20 20"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <circle
+                  cx="10"
+                  cy="10"
+                  r="8"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                />
+                <path
+                  d="M10 6v4l2.5 2.5"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            ),
+          },
+        ]
+      : []),
   ];
 
   const appFeatures = [
@@ -612,8 +640,11 @@ function SubscriptionSection({ onCancel, user, stats }) {
 
   const subStatus = subscription?.status ?? "trial";
   const isActive = subStatus === "active";
+  const isCancelled = subStatus === "cancelled";
 
-  const recommendedTier = getRecommendedTier(stats?.properties ?? 0);
+  const propertyCount = stats?.properties ?? 0;
+  const recommendedTier =
+    propertyCount <= 5 ? "tier3" : propertyCount <= 15 ? "tier2" : "tier1";
   const currentTier = isActive
     ? (subscription?.tier ?? recommendedTier)
     : recommendedTier;
@@ -624,14 +655,16 @@ function SubscriptionSection({ onCancel, user, stats }) {
       ? new Date(user.$createdAt)
       : null;
 
+  const trialLength = subscription?.trialDays ?? 14;
   const trialDaysLeft = trialStartDate
     ? Math.max(
         0,
-        14 - Math.floor((Date.now() - trialStartDate) / (1000 * 60 * 60 * 24)),
+        trialLength -
+          Math.floor((Date.now() - trialStartDate) / (1000 * 60 * 60 * 24)),
       )
-    : null;
+    : trialLength;
 
-  const isInTrial = trialDaysLeft !== null && trialDaysLeft > 0 && !isActive;
+  const isInTrial = trialDaysLeft > 0 && !isActive && !isCancelled;
 
   const periodEnd = subscription?.currentPeriodEnd
     ? new Date(subscription.currentPeriodEnd).toLocaleDateString("en-GB", {
@@ -641,29 +674,60 @@ function SubscriptionSection({ onCancel, user, stats }) {
       })
     : null;
 
-  /*   const handleSubscribe = async (tier) => {
-    if (!user || isInTrial) return; */
+  const accessEnds = isCancelled && periodEnd ? periodEnd : null;
 
-  const handleSubscribe = async (tier) => {
+  const plans = [
+    {
+      id: "tier3",
+      name: "Tier 3",
+      price: "£15.99",
+      description: "Up to 5 properties",
+      maxProperties: 5,
+    },
+    {
+      id: "tier2",
+      name: "Tier 2",
+      price: "£29.99",
+      description: "Up to 15 properties",
+      maxProperties: 15,
+    },
+    {
+      id: "tier1",
+      name: "Tier 1",
+      price: "£59.99",
+      description: "Unlimited properties",
+      maxProperties: null,
+    },
+  ];
+
+  const currentPlanMeta = plans.find((p) => p.id === currentTier) ?? plans[0];
+
+  const handleSubscribe = async () => {
     if (!user) return;
     setLoading(true);
     try {
+      const jwt = await account.createJWT();
+
       const functions = new Functions(client);
       const execution = await functions.createExecution(
         import.meta.env.VITE_FUNCTION_CREATE_GC_SUBSCRIPTION_ID,
         JSON.stringify({
-          tier,
+          tier: currentTier,
           email: user.email,
           name: user.name,
-          number: user.phone,
+          jwt: jwt.jwt,
         }),
         false,
+        "/",
+        "POST",
       );
+
       const result = JSON.parse(execution.responseBody || "{}");
-      if (result.ok && result.hostedUrl) {
+
+      if (result?.ok && result?.hostedUrl) {
         window.location.href = result.hostedUrl;
       } else {
-        alert(result.message || "Failed to start subscription.");
+        alert(result?.message || "Failed to start subscription.");
       }
     } catch (err) {
       alert(err.message || "Something went wrong.");
@@ -672,183 +736,175 @@ function SubscriptionSection({ onCancel, user, stats }) {
     }
   };
 
-  const plans = [
-    {
-      id: "tier3",
-      name: "Tier 3",
-      shortName: "tier3",
-      price: "£15.99",
-      props: "For landlords managing up to 5 properties",
-    },
-    {
-      id: "tier2",
-      name: "Tier 2",
-      shortName: "tier2",
-      price: "£29.99",
-      props: "For growing portfolios with up to 15 properties",
-    },
-    {
-      id: "tier1",
-      name: "Tier 1",
-      shortName: "tier1",
-      price: "£59.99",
-      props: "For large or expanding portfolios",
-    },
-  ];
-
-  const currentPlanMeta = plans.find((p) => p.id === currentTier) ?? plans[0];
-
-  const propertyCount = stats?.properties ?? 0;
-  const needsUpgrade =
-    isActive && propertyCount > TIER_CONFIG[currentTier]?.maxProperties;
-  const upgradeTier = needsUpgrade ? getRecommendedTier(propertyCount) : null;
-  const upgradePlanMeta = upgradeTier
-    ? plans.find((p) => p.id === upgradeTier)
-    : null;
-
-  const getPlanActionLabel = (plan) => {
-    if (isInTrial) return "Available after trial";
-    if (plan.id === currentTier && isActive) return "Current plan";
-    if (!isActive) return `Choose ${plan.shortName}`;
-    const currentMax = TIER_CONFIG[currentTier]?.maxProperties ?? Infinity;
-    const planMax = TIER_CONFIG[plan.id]?.maxProperties ?? Infinity;
-    if (planMax > currentMax) return `Upgrade to ${plan.shortName}`;
-    if (planMax < currentMax) return `Downgrade to ${plan.shortName}`;
-    return `Switch to ${plan.shortName}`;
-  };
-
   return (
     <div>
       <div className={styles.pageHeader}>
         <h2>Subscription</h2>
         <p>
-          All plans include full Letivios access. Pricing only changes based on
-          how many properties you manage.
+          All plans include full Letivios access. Pricing is based on how many
+          properties you manage.
         </p>
       </div>
 
-      {needsUpgrade && upgradePlanMeta && (
-        <div className={styles.upgradeBanner}>
-          <strong>⚠️ Property limit reached</strong> — you have {propertyCount}{" "}
-          properties but your {currentPlanMeta.name} plan supports only{" "}
-          {TIER_CONFIG[currentTier].maxProperties}. Upgrade to{" "}
-          <strong>{upgradePlanMeta.name}</strong> to continue adding properties.
-        </div>
-      )}
-
+      {/* ── Top status card ── */}
       <div className={styles.subCurrent}>
         <div className={styles.subTierBadge}>
           {isActive
-            ? `${currentPlanMeta.shortName} plan active`
-            : "Free trial active"}
+            ? `${currentPlanMeta.name} — Active`
+            : isCancelled
+              ? "Subscription Cancelled"
+              : isInTrial
+                ? "Free Trial Active"
+                : "Trial Ended"}
         </div>
+
         <div className={styles.subPrice}>
-          {currentPlanMeta.price} <span>/month</span>
+          {isActive ? currentPlanMeta.price : "Free"}
+          <span>{isActive ? "/month" : isInTrial ? " during trial" : ""}</span>
         </div>
-        <div className={styles.subRenews}>
-          Supports{" "}
-          <strong>
-            {currentPlanMeta.id === "tier3"
-              ? "up to 5 properties"
-              : currentPlanMeta.id === "tier2"
-                ? "up to 15 properties"
-                : "unlimited properties"}
-          </strong>
-        </div>
-        {periodEnd && (
+
+        {!isCancelled && (
           <div className={styles.subRenews}>
-            {isActive ? `Renews ${periodEnd}` : `Trial ends ${periodEnd}`}
+            {isActive
+              ? `Supports ${currentPlanMeta.description}`
+              : `Your plan after trial: ${currentPlanMeta.name} (${currentPlanMeta.price}/mo · ${currentPlanMeta.description})`}
           </div>
         )}
-        {isInTrial && trialDaysLeft !== null && (
-          <div className={styles.subActions}>
-            <p style={{ fontSize: 13, color: "#6B7280", marginBottom: 0 }}>
-              🎉 Your free trial is active —{" "}
-              <strong>
-                {stats.trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""}{" "}
-                remaining
-              </strong>
-              . All features are included. You'll only choose a pricing tier
-              based on the number of properties you manage.
-            </p>
+
+        {isInTrial && (
+          <div className={styles.subRenews} style={{ marginTop: 6 }}>
+            <strong>
+              {trialDaysLeft} day{trialDaysLeft !== 1 ? "s" : ""} remaining
+            </strong>{" "}
+            — set up your Direct Debit now so your access continues
+            automatically. No payment is taken until your trial ends.
           </div>
         )}
-        {!isInTrial && !isActive && trialDaysLeft !== null && (
-          <div className={styles.subActions}>
-            <p style={{ fontSize: 13, color: "#6B7280", marginBottom: 12 }}>
-              Choose the property limit that fits your portfolio. All plans
-              include the same functionality and are collected securely by
-              direct debit via GoCardless.
-            </p>
+
+        {isCancelled && accessEnds && (
+          <div className={styles.subRenews} style={{ color: "#DC2626" }}>
+            Your access ends {accessEnds}
           </div>
         )}
-        {isActive && (
-          <div className={styles.subActions}>
+
+        {isCancelled && (
+          <div
+            className={styles.subRenews}
+            style={{ marginTop: 4, fontSize: 13, color: "#6B7280" }}
+          >
+            You can resubscribe at any time to continue using Letivios.
+          </div>
+        )}
+
+        {periodEnd && isActive && (
+          <div className={styles.subRenews}>Renews {periodEnd}</div>
+        )}
+
+        <div className={styles.subActions} style={{ marginTop: 16 }}>
+          {!isActive && !isCancelled && !subscription?.gcMandateId && (
+            <button
+              className={styles.btnPrimary}
+              onClick={handleSubscribe}
+              disabled={loading}
+            >
+              {loading
+                ? "Loading..."
+                : isInTrial
+                  ? "Set up Direct Debit — no charge until trial ends"
+                  : "Subscribe via GoCardless"}
+            </button>
+          )}
+          {isInTrial && subscription?.gcMandateId && (
+            <>
+              <div style={{ fontSize: 13, color: "#6B7280", marginBottom: 10 }}>
+                ✅ Direct Debit set up — your first payment will be taken when
+                your trial ends.
+              </div>
+              <button className={styles.btnOutline} onClick={onCancel}>
+                Cancel Direct Debit
+              </button>
+            </>
+          )}
+          {isActive && (
             <button className={styles.btnOutline} onClick={onCancel}>
               Cancel subscription
             </button>
-          </div>
-        )}
+          )}
+          {isCancelled && (
+            <button
+              className={styles.btnPrimary}
+              onClick={handleSubscribe}
+              disabled={loading}
+            >
+              {loading ? "Loading..." : "Resubscribe via GoCardless"}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* ── Pricing tiers (info only) ── */}
+      <div style={{ marginTop: 28, marginBottom: 8 }}>
+        <p
+          style={{
+            fontSize: 13,
+            fontWeight: 600,
+            color: "#374151",
+            marginBottom: 4,
+          }}
+        >
+          Pricing tiers
+        </p>
+        <p style={{ fontSize: 12, color: "#9CA3AF", marginBottom: 16 }}>
+          Your tier is set automatically based on your property count. It
+          adjusts at each billing cycle.
+        </p>
       </div>
 
       <div className={styles.plansGrid}>
-        {plans.map((plan) => {
-          const isCurrent = plan.id === currentTier;
-          return (
-            <div
-              key={plan.id}
-              className={`${styles.planCard} ${isCurrent ? styles.planCardCurrent : ""}`}
-            >
-              <div className={styles.planTier}>{plan.name}</div>
-              <div className={styles.planPriceLg}>
-                {plan.price}
-                <sub>/mo</sub>
-              </div>
-              <div className={styles.planPropsLabel}>{plan.props}</div>
-              <ul className={styles.planFeatures}>
-                <li>Full access to all Letivios features</li>
-                <li>
-                  {plan.id === "tier3"
-                    ? "Manage up to 5 properties"
-                    : plan.id === "tier2"
-                      ? "Manage up to 15 properties"
-                      : "Manage unlimited properties"}
-                </li>
-                <li>Upgrade anytime as your portfolio grows</li>
-              </ul>
-              <button
-                className={
-                  isCurrent && isActive
-                    ? styles.planBtnCurrent
-                    : styles.planBtnOutline
-                }
-                onClick={() => handleSubscribe(plan.id)}
-                disabled={loading || isInTrial || (isCurrent && isActive)}
-              >
-                {loading ? "Loading..." : getPlanActionLabel(plan)}
-              </button>
+        {plans.map((plan) => (
+          <div key={plan.id} className={styles.planCard}>
+            <div className={styles.planTier}>{plan.name}</div>
+            <div className={styles.planPriceLg}>
+              {plan.price}
+              <sub>/mo</sub>
             </div>
-          );
-        })}
+            <div className={styles.planPropsLabel}>{plan.description}</div>
+            <ul className={styles.planFeatures}>
+              <li>Full access to all Letivios features</li>
+              <li>{plan.description}</li>
+              <li>Adjusts automatically as your portfolio grows</li>
+            </ul>
+            {plan.id === currentTier && (
+              <div className={styles.planAutoNote}>
+                📍 Your current tier — based on <strong>{propertyCount}</strong>{" "}
+                {propertyCount === 1 ? "property" : "properties"}
+              </div>
+            )}
+          </div>
+        ))}
       </div>
 
-      {!isActive && (
-        <div
-          className={styles.cancelZone}
-          style={{ backgroundColor: "#F0FDF4", borderColor: "#BBF7D0" }}
-        >
-          <div className={styles.cancelZoneTitle} style={{ color: "#166534" }}>
-            🔒 Secure direct debit via GoCardless
-          </div>
-          <div className={styles.cancelZoneDesc}>
-            GoCardless is FCA authorised and used by thousands of UK businesses.
-            Your bank details are never shared with us. You can cancel anytime.
-          </div>
+      {/* ── GoCardless trust note ── */}
+      <div
+        className={styles.cancelZone}
+        style={{
+          backgroundColor: "#F0FDF4",
+          borderColor: "#BBF7D0",
+          marginTop: 24,
+        }}
+      >
+        <div className={styles.cancelZoneTitle} style={{ color: "#166534" }}>
+          🔒 Secure direct debit via GoCardless
         </div>
-      )}
+        <div className={styles.cancelZoneDesc}>
+          GoCardless is FCA authorised and used by thousands of UK businesses.
+          Your bank details are never shared with us. You can cancel anytime.
+        </div>
+      </div>
 
+      {/* ── Cancel zone (active only) ── */}
       {isActive && (
-        <div className={styles.cancelZone}>
+        <div className={styles.cancelZone} style={{ marginTop: 16 }}>
           <div className={styles.cancelZoneTitle}>Cancel subscription</div>
           <div className={styles.cancelZoneDesc}>
             Cancelling will end your access at the end of your current billing

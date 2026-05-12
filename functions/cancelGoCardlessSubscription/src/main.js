@@ -42,17 +42,17 @@ async function gcRequest(method, path, body) {
 export default async ({ req, res, log, error }) => {
   try {
     // 1. Auth check
-    const jwt = req.headers?.["x-appwrite-user-jwt"];
+    const body =
+      typeof req.body === "string" ? JSON.parse(req.body) : (req.body ?? {});
+
+    const jwt = req.headers?.["x-appwrite-user-jwt"] ?? body.jwt;
     if (!jwt) return res.json({ ok: false, message: "Unauthorised." }, 401);
 
     const payload = JSON.parse(
       Buffer.from(jwt.split(".")[1], "base64").toString(),
     );
-    const landlordId = payload.userId;
+    const landlordId = payload.sub ?? payload.userId;
 
-    // 2. Parse body
-    const body =
-      typeof req.body === "string" ? JSON.parse(req.body) : (req.body ?? {});
     const { mandateId } = body;
 
     if (!mandateId) {
