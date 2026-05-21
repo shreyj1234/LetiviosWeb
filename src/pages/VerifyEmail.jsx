@@ -19,7 +19,7 @@ export default function VerifyEmail() {
       try {
         await account.updateVerification(userId, secret);
         setStatus("success");
-        setTimeout(() => navigate("/auth"), 2000); // send to sign in
+        setTimeout(() => navigate("/auth"), 2000);
       } catch (err) {
         console.error("updateVerification error:", err.code, err.message);
         setStatus("error");

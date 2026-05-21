@@ -134,28 +134,6 @@ export default function Home() {
               <p className={styles.heroTrust}>
                 No credit card required · Cancel anytime
               </p>
-              <div
-                className={`${styles.heroReplacesWrap} ${styles.reveal} ${styles.heroReveal} ${styles.delay4}`}
-              >
-                <p className={styles.replacesLabel}>
-                  Replaces your current tools
-                </p>
-                <div className={styles.heroReplaces}>
-                  {[
-                    ["WhatsApp groups", "In-app messaging"],
-                    ["Excel spreadsheets", "Payment tracking"],
-                    ["Email attachments", "Document storage"],
-                    ["Phone calls", "Maintenance jobs"],
-                    ["Paper notices", "Digital records"],
-                  ].map(([before, after]) => (
-                    <div key={before} className={styles.heroReplacesItem}>
-                      <span className={styles.replacesBefore}>{before}</span>
-                      <span className={styles.replacesArrow}>→</span>
-                      <span className={styles.replacesAfter}>{after}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
               <p
                 className={`${styles.heroNote} ${styles.reveal} ${styles.heroReveal} ${styles.delay5}`}
               >
@@ -168,109 +146,33 @@ export default function Home() {
             <div
               className={`${styles.heroVisual} ${styles.reveal} ${styles.heroReveal} ${styles.delay2}`}
             >
-              <div className={styles.phoneWrap}>
-                <div className={styles.phoneGlow} />
-                <div className={styles.phone}>
-                  <div className={styles.phoneNotch} />
-                  <div className={styles.phoneScreen}>
-                    <div className={styles.phoneHeader}>
-                      <div className={styles.phoneHeaderTitle}>Portfolio</div>
-                      <div className={styles.phoneHeaderSub}>
-                        Manage properties & tenants
-                      </div>
-                      <div className={styles.phoneHeaderStats}>
-                        {[
-                          ["4", "Properties"],
-                          ["3", "Occupied"],
-                          ["1", "Vacant"],
-                        ].map(([v, l]) => (
-                          <div key={l} className={styles.phoneStat}>
-                            <div className={styles.phoneStatV}>{v}</div>
-                            <div className={styles.phoneStatL}>{l}</div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    <div className={styles.phoneCards}>
-                      <div className={styles.phoneCard}>
-                        <div
-                          className={styles.phoneCardIcon}
-                          style={{ background: "rgba(74,124,255,0.15)" }}
-                        >
-                          🏠
-                        </div>
-                        <div>
-                          <div className={styles.phoneCardTitle}>
-                            12 Baker Street
-                          </div>
-                          <div className={styles.phoneCardSub}>
-                            2 bed · Flat · £1,400/mo
-                          </div>
-                        </div>
-                        <div
-                          className={styles.phoneCardBadge}
-                          style={{
-                            background: "rgba(34,197,94,0.15)",
-                            color: "#22c55e",
-                          }}
-                        >
-                          Active
-                        </div>
-                      </div>
-                      <div className={styles.phoneCard}>
-                        <div
-                          className={styles.phoneCardIcon}
-                          style={{ background: "rgba(232,180,90,0.15)" }}
-                        >
-                          💳
-                        </div>
-                        <div>
-                          <div className={styles.phoneCardTitle}>
-                            Rent due in 3 days
-                          </div>
-                          <div className={styles.phoneCardSub}>
-                            S. Holmes · £1,400
-                          </div>
-                        </div>
-                        <div
-                          className={styles.phoneCardBadge}
-                          style={{
-                            background: "rgba(232,180,90,0.15)",
-                            color: "#e8b45a",
-                          }}
-                        >
-                          Soon
-                        </div>
-                      </div>
-                      <div className={styles.phoneCard}>
-                        <div
-                          className={styles.phoneCardIcon}
-                          style={{ background: "rgba(239,68,68,0.15)" }}
-                        >
-                          🔧
-                        </div>
-                        <div>
-                          <div className={styles.phoneCardTitle}>
-                            Boiler repair
-                          </div>
-                          <div className={styles.phoneCardSub}>
-                            J. Smith Plumbing
-                          </div>
-                        </div>
-                        <div
-                          className={styles.phoneCardBadge}
-                          style={{
-                            background: "rgba(74,124,255,0.15)",
-                            color: "#4a7cff",
-                          }}
-                        >
-                          Open
-                        </div>
-                      </div>
-                    </div>
-                  </div>
+              <img
+                src="/images/phones.png"
+                alt="Letivios app screenshots"
+                style={{ width: "100%", maxWidth: "720px", display: "block" }}
+              />
+            </div>
+          </div>
+
+          {/* Replaces strip */}
+          <div
+            className={`${styles.heroReplacesWrap} ${styles.reveal} ${styles.heroReveal} ${styles.delay4}`}
+          >
+            <p className={styles.replacesLabel}>Replaces your current tools</p>
+            <div className={styles.heroReplaces}>
+              {[
+                ["WhatsApp groups", "In-app messaging"],
+                ["Excel spreadsheets", "Payment tracking"],
+                ["Email attachments", "Document storage"],
+                ["Phone calls", "Maintenance jobs"],
+                ["Paper notices", "Digital records"],
+              ].map(([before, after]) => (
+                <div key={before} className={styles.heroReplacesItem}>
+                  <span className={styles.replacesBefore}>{before}</span>
+                  <span className={styles.replacesArrow}>→</span>
+                  <span className={styles.replacesAfter}>{after}</span>
                 </div>
-              </div>
+              ))}
             </div>
           </div>
         </div>
@@ -296,13 +198,17 @@ export default function Home() {
             </div>
             <div className={styles.pricingRow}>
               {[
-                { name: "Starter", price: "£15", props: "Up to 5 Properties" },
+                {
+                  name: "Starter",
+                  price: "£15.99",
+                  props: "Up to 5 Properties",
+                },
                 {
                   name: "Growth",
-                  price: "£29",
+                  price: "£29.99",
                   props: "Up to 15 Properties",
                 },
-                { name: "Pro", price: "£59", props: "Unlimited Properties" },
+                { name: "Pro", price: "£59.99", props: "Unlimited Properties" },
               ].map((p) => (
                 <div key={p.name} className={styles.pricingCard}>
                   <div className={styles.pricingName}></div>

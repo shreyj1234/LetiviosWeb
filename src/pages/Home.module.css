@@ -142,10 +142,11 @@
   align-items: center;
   gap: 16px;
   flex-wrap: wrap;
-  margin-bottom: 10px;
+  margin-bottom: 6px;
+  margin-top: 28px;
 }
 .heroTrust {
-  margin-top: 6px;
+  margin-top: 4px;
   font-size: 13px;
   color: var(--text-muted);
 }
@@ -183,7 +184,8 @@
   margin-top: 2px;
 }
 .heroNote {
-  margin-top: 20px;
+  margin-top: 8px;
+  margin-bottom: 0;
   font-size: 13px;
   color: var(--text-muted);
   font-weight: 500;
@@ -214,10 +216,13 @@
 /* Phone */
 .heroVisual {
   display: flex;
-  justify-content: center;
+  justify-content: flex-start;
   align-items: center;
   position: relative;
+  margin-top: -60px;
+  margin-left: -40px;
 }
+
 .phoneWrap {
   position: relative;
   padding-top: 40px;
@@ -374,15 +379,15 @@
 }
 
 .heroReplaces {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2px 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 48px;
 }
 .heroReplacesWrap {
   margin-top: 24px;
-  padding-top: 20px;
+  padding-top: 24px;
   border-top: 1px solid var(--border2);
-  max-width: 480px;
+  width: 100%;
 }
 .heroReplacesItem {
   display: flex;

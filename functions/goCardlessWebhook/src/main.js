@@ -156,8 +156,11 @@ export default async ({ req, res, log, error }) => {
         const landlordId = payment?.metadata?.landlordId;
         if (!landlordId) continue;
 
+        const chargeDate = payment?.charge_date
+          ? new Date(payment.charge_date)
+          : new Date();
         const periodEnd = new Date(
-          Date.now() + 30 * 24 * 60 * 60 * 1000,
+          chargeDate.getTime() + 31 * 24 * 60 * 60 * 1000,
         ).toISOString();
 
         const subRes = await databases.listDocuments(
