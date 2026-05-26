@@ -497,13 +497,19 @@ export default function Home() {
               />
             </a>
             <div className={styles.footerLinks}>
-              <a href="#" className={styles.footerLink}>
+              <a href="/privacy" className={styles.footerLink}>
                 Privacy
               </a>
-              <a href="#" className={styles.footerLink}>
+              <a href="/terms" className={styles.footerLink}>
                 Terms
               </a>
-              <a href="#" className={styles.footerLink}>
+              <a href="/cookies" className={styles.footerLink}>
+                Cookies
+              </a>
+              <a
+                href="mailto:letivios@outlook.com"
+                className={styles.footerLink}
+              >
                 Support
               </a>
             </div>
