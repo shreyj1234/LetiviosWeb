@@ -287,8 +287,10 @@ export default function Dashboard() {
           <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalTitle}>Cancel subscription?</div>
             <div className={styles.modalDesc}>
-              Your access continues until the end of your billing period. Data
-              kept for 90 days.
+              Your access continues until the end of your current billing
+              period. Cancelling ends your subscription only — your data is
+              retained. To permanently delete your account and data, use "Delete
+              Account" in the app profile.
             </div>
             <div className={styles.modalActions}>
               <button
@@ -908,7 +910,9 @@ function SubscriptionSection({ onCancel, user, stats }) {
           <div className={styles.cancelZoneTitle}>Cancel subscription</div>
           <div className={styles.cancelZoneDesc}>
             Cancelling will end your access at the end of your current billing
-            period. Your data is retained for 90 days.
+            period. Your data is retained after cancellation. To permanently
+            delete your account and data, use "Delete Account" in the app
+            profile.
           </div>
           <button className={styles.cancelBtn} onClick={onCancel}>
             Cancel subscription

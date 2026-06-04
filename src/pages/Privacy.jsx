@@ -28,8 +28,8 @@ export default function Privacy() {
           <div className={styles.eyebrow}>Legal</div>
           <h1 className={styles.title}>Privacy Policy</h1>
           <p className={styles.meta}>
-            Brimcore Technologies Ltd · Company No. 17138624 · Last updated: May
-            2026
+            Brimcore Technologies Ltd · Company No. 17138624 · Last updated:
+            June 2026
           </p>
         </div>
 
@@ -43,9 +43,9 @@ export default function Privacy() {
           </p>
           <p>
             We are registered with the Information Commissioner's Office (ICO)
-            as a data controller [ICO registration number to be inserted once
-            issued]. If you have any questions about this policy or wish to
-            exercise your rights, contact us at letivios@outlook.com.
+            as a data controller ZC157016. If you have any questions about this
+            policy or wish to exercise your rights, contact us at
+            letivios@outlook.com.
           </p>
 
           <h2>2. Who This Policy Applies To</h2>
@@ -211,7 +211,7 @@ export default function Privacy() {
               </tr>
               <tr>
                 <td>Sending push notifications</td>
-                <td>Legitimate interests</td>
+                <td>Consent</td>
               </tr>
               <tr>
                 <td>Rent payment notifications</td>
@@ -249,49 +249,79 @@ export default function Privacy() {
           </p>
 
           <h2>5. Who We Share Your Data With</h2>
+          <p>
+            We use the following sub-processors to operate the Letivios
+            platform. We have Data Processing Agreements (DPAs) in place with
+            each processor as required by UK GDPR Article 28.
+          </p>
           <table className={styles.table}>
             <thead>
               <tr>
                 <th>Sub-Processor</th>
                 <th>Purpose</th>
+                <th>Data Shared</th>
                 <th>Location</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>Appwrite (Frankfurt)</td>
-                <td>Database, file storage, authentication</td>
-                <td>EU</td>
+                <td>Database, file storage, and authentication</td>
+                <td>All user account and platform data</td>
+                <td>EU (Frankfurt)</td>
               </tr>
               <tr>
                 <td>GoCardless Ltd</td>
-                <td>Direct Debit processing</td>
+                <td>Direct Debit subscription billing for landlords</td>
+                <td>
+                  Landlord name, email address, and mandate details. GoCardless
+                  acts as an independent data controller for payment data and
+                  has their own Privacy Policy at gocardless.com/legal/privacy.
+                </td>
                 <td>UK / EU</td>
               </tr>
               <tr>
-                <td>Expo Inc.</td>
-                <td>Push notifications, app infrastructure</td>
-                <td>USA</td>
+                <td>Expo Inc. (via Apple APNS and Google FCM)</td>
+                <td>Push notification delivery to mobile devices</td>
+                <td>
+                  Push notification tokens (device identifiers) and notification
+                  content (notification title and body only — no financial or
+                  tenancy data)
+                </td>
+                <td>USA (UK–US Data Bridge)</td>
+              </tr>
+              <tr>
+                <td>Google LLC (Google Fonts)</td>
+                <td>Font delivery</td>
+                <td>
+                  Website visitors' IP addresses are sent to Google's servers
+                  when fonts load. No personal account data is shared.
+                </td>
+                <td>USA (Standard Contractual Clauses)</td>
               </tr>
               <tr>
                 <td>Vercel Inc.</td>
-                <td>Website hosting and access logs</td>
-                <td>USA</td>
+                <td>Website hosting and delivery</td>
+                <td>IP addresses and HTTP access logs (retained 90 days)</td>
+                <td>USA (UK–US Data Bridge)</td>
               </tr>
               <tr>
                 <td>GoDaddy</td>
-                <td>Domain registration</td>
-                <td>USA</td>
+                <td>Domain name registration (letivios.com)</td>
+                <td>Registrant contact details only</td>
+                <td>USA (Standard Contractual Clauses)</td>
               </tr>
               <tr>
                 <td>Apple (App Store)</td>
-                <td>iOS app distribution</td>
-                <td>USA</td>
+                <td>iOS app distribution and in-app purchase infrastructure</td>
+                <td>App Store account identifiers only</td>
+                <td>USA (Standard Contractual Clauses)</td>
               </tr>
               <tr>
                 <td>Google (Play Store)</td>
                 <td>Android app distribution</td>
-                <td>USA</td>
+                <td>Play Store account identifiers only</td>
+                <td>USA (Standard Contractual Clauses)</td>
               </tr>
             </tbody>
           </table>
@@ -332,45 +362,75 @@ export default function Privacy() {
               <tr>
                 <th>Data Type</th>
                 <th>Retention Period</th>
+                <th>Reason</th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td>Account data (name, email)</td>
-                <td>Duration of account + 2 years</td>
+                <td>Account data (name, email, role)</td>
+                <td>
+                  Duration of account, then deleted within 30 days of deletion
+                  request
+                </td>
+                <td>Service operation</td>
               </tr>
               <tr>
                 <td>Property and tenancy records</td>
                 <td>Duration of tenancy + 6 years</td>
+                <td>
+                  Landlord legal obligations (Landlord and Tenant Act 1985)
+                </td>
               </tr>
               <tr>
-                <td>Payment records</td>
-                <td>6 years</td>
+                <td>Payment records (rent, subscriptions)</td>
+                <td>7 years from the date of the transaction</td>
+                <td>UK tax and financial record-keeping requirements (HMRC)</td>
               </tr>
               <tr>
                 <td>Job and maintenance records</td>
                 <td>Duration of tenancy + 2 years</td>
+                <td>Dispute resolution</td>
               </tr>
               <tr>
-                <td>Messages</td>
-                <td>Duration of account</td>
+                <td>Messages and job comments</td>
+                <td>Deleted within 30 days of account deletion request</td>
+                <td>Retained only while account is active</td>
               </tr>
               <tr>
-                <td>Documents</td>
+                <td>Inspection records and photos</td>
                 <td>
-                  Duration of account or until both parties consent to deletion
+                  Duration of tenancy + 2 years, then deleted within 30 days
                 </td>
+                <td>Deposit dispute evidence (Tenancy Deposit Scheme)</td>
+              </tr>
+              <tr>
+                <td>Documents (tenancy agreements, certificates)</td>
+                <td>
+                  Duration of account or until both parties request deletion
+                </td>
+                <td>Legal documentation requirements</td>
               </tr>
               <tr>
                 <td>Push notification tokens</td>
-                <td>Until app is uninstalled or permission revoked</td>
+                <td>
+                  Until app is uninstalled, permission revoked, or account
+                  deleted
+                </td>
+                <td>Notification delivery</td>
+              </tr>
+              <tr>
+                <td>Server access logs (IP addresses)</td>
+                <td>90 days</td>
+                <td>Security monitoring (Vercel default)</td>
               </tr>
             </tbody>
           </table>
           <p>
             When your account is deleted, we will delete or anonymise your
             personal data within 30 days, except where we are required by law to
-            retain it longer.
+            retain it longer (for example, payment records must be kept for 7
+            years under UK tax law). In those cases, retained data is kept
+            securely and not used for any other purpose.
           </p>
 
           <h2>8. Your Rights Under UK GDPR</h2>
@@ -409,7 +469,38 @@ export default function Privacy() {
             complain to the ICO at ico.org.uk or 0303 123 1113.
           </p>
 
-          <h2>9. Security</h2>
+          <h2>9. Data Breaches</h2>
+          <p>
+            In the unlikely event of a personal data breach, Letivios will act
+            in accordance with our obligations under UK GDPR Articles 33 and 34:
+          </p>
+          <ul>
+            <li>
+              <strong>ICO notification:</strong> Where a breach is likely to
+              result in a risk to your rights and freedoms, we will notify the
+              Information Commissioner's Office (ICO) within 72 hours of
+              becoming aware of it.
+            </li>
+            <li>
+              <strong>User notification:</strong> Where a breach is likely to
+              result in a high risk to your rights and freedoms, we will notify
+              affected users directly without undue delay, explaining the nature
+              of the breach, likely consequences, and the measures we have taken
+              or propose to take.
+            </li>
+            <li>
+              <strong>Record keeping:</strong> We maintain an internal record of
+              all data breaches regardless of whether notification to the ICO is
+              required.
+            </li>
+          </ul>
+          <p>
+            If you suspect your account has been compromised, contact us
+            immediately at{" "}
+            <a href="mailto:letivios@outlook.com">letivios@outlook.com</a>.
+          </p>
+
+          <h2>10. Security</h2>
           <p>Our security measures include:</p>
           <ul>
             <li>All data in transit encrypted using TLS/HTTPS</li>
@@ -420,6 +511,12 @@ export default function Privacy() {
               Access to personal data limited to what is necessary for each user
               role
             </li>
+            <li>
+              Bank account details (sort code and account number) are stored in
+              access-controlled documents readable only by the landlord who
+              entered them and their linked tenant. These fields are not
+              accessible via the API to any other user role.
+            </li>
           </ul>
           <div className={styles.callout}>
             <p>
@@ -429,7 +526,7 @@ export default function Privacy() {
             </p>
           </div>
 
-          <h2>10. Children</h2>
+          <h2>11. Children</h2>
           <p>
             Letivios is not intended for use by anyone under the age of 18. We
             do not knowingly collect personal data from children. Contact us at
@@ -437,21 +534,22 @@ export default function Privacy() {
             personal data and we will delete it.
           </p>
 
-          <h2>11. Changes to This Policy</h2>
+          <h2>12. Changes to This Policy</h2>
           <p>
             We may update this Privacy Policy from time to time. We will notify
-            you of significant changes via the app or by email. Continued use of
-            Letivios after changes are notified constitutes acceptance.
+            you of significant changes via the app or by email before they take
+            effect. For material changes affecting how we use your personal
+            data, we will obtain fresh consent where required by UK GDPR.
           </p>
 
-          <h2>12. Contact Us</h2>
+          <h2>13. Contact Us</h2>
           <p>
             Brimcore Technologies Ltd, 7 Meadow Oak Drive, Liverpool, L25 3SZ
             <br />
             Email:{" "}
             <a href="mailto:letivios@outlook.com">letivios@outlook.com</a>
             <br />
-            ICO Registration: [to be inserted]
+            ICO Registration: ZC157016
           </p>
         </div>
 

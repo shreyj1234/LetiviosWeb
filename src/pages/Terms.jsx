@@ -384,6 +384,13 @@ export default function Terms() {
               or indirect. This applies even if we were advised such losses were
               possible.
             </p>
+            <h3>Data Security and Breach Notification</h3>
+            <p>
+              We implement appropriate technical and organisational measures to
+              protect your personal data. In the event of a data breach
+              affecting your personal data, we will notify you in accordance
+              with our Privacy Policy and applicable UK GDPR obligations.
+            </p>
           </div>
 
           <h2>10. Indemnity</h2>

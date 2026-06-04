@@ -14,6 +14,7 @@ export default function Auth() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [showSignInPassword, setShowSignInPassword] = useState(false);
+  const [consentChecked, setConsentChecked] = useState(false);
 
   const [signInForm, setSignInForm] = useState({ email: "", password: "" });
   const [signUpForm, setSignUpForm] = useState({
@@ -71,6 +72,8 @@ export default function Auth() {
             webAuthEnabled: false,
             onboardingComplete: false,
             maxProperties: null,
+            consentGivenAt: prefs.consentGivenAt ?? new Date().toISOString(),
+            privacyPolicyVersion: prefs.privacyPolicyVersion ?? "June 2026",
           },
         );
 
@@ -108,6 +111,12 @@ export default function Auth() {
     if (password !== confirmPassword)
       return showError("Passwords do not match.");
 
+    if (!consentChecked) {
+      return showError(
+        "Please read and agree to our Privacy Policy and Terms of Service to continue.",
+      );
+    }
+
     const VALID_PROMO_CODES = { EARLYBIRD: 60 };
     const appliedPromo = promoCode.trim().toUpperCase();
 
@@ -135,6 +144,8 @@ export default function Auth() {
         pendingSetup: true,
         promoCode: appliedPromo || null,
         trialDays: appliedPromo ? VALID_PROMO_CODES[appliedPromo] : 14,
+        consentGivenAt: new Date().toISOString(),
+        privacyPolicyVersion: "June 2026",
       });
 
       await account.createVerification(
@@ -389,21 +400,44 @@ export default function Auth() {
                 />
               </div>
 
-              <p className={styles.fieldHintTerms}>
-                By creating an account you agree to Letivios's{" "}
-                <a href="/terms" className={styles.fieldHintLink}>
-                  Terms of Service
-                </a>{" "}
-                and{" "}
-                <a href="/privacy" className={styles.fieldHintLink}>
-                  Privacy Policy
-                </a>
-                . Your subscription will be managed through this website.
-              </p>
+              <div className={styles.consentRow}>
+                <input
+                  type="checkbox"
+                  id="consent-checkbox"
+                  className={styles.consentCheckbox}
+                  checked={consentChecked}
+                  onChange={(e) => setConsentChecked(e.target.checked)}
+                />
+                <label
+                  htmlFor="consent-checkbox"
+                  className={styles.consentLabel}
+                >
+                  I have read and agree to the{" "}
+                  <a
+                    href="/privacy"
+                    className={styles.fieldHintLink}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Privacy Policy
+                  </a>{" "}
+                  and{" "}
+                  <a
+                    href="/terms"
+                    className={styles.fieldHintLink}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Terms of Service
+                  </a>
+                  . Your subscription will be managed through this website.
+                </label>
+              </div>
               <button
                 className={styles.submitBtn}
                 onClick={handleSignUp}
-                disabled={loading}
+                disabled={loading || !consentChecked}
+                style={{ opacity: !consentChecked ? 0.6 : 1 }}
               >
                 {loading ? "Creating account..." : "Start Free Trial"}
               </button>
