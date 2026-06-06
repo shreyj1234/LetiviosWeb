@@ -38,7 +38,22 @@ export default function Dashboard() {
   useEffect(() => {
     account
       .get()
-      .then((u) => {
+      .then(async (u) => {
+        try {
+          const dbId = import.meta.env.VITE_APPWRITE_DATABASE_ID;
+          const res = await databases.listDocuments(dbId, "users", [
+            Query.equal("$id", u.$id),
+            Query.limit(1),
+          ]);
+          if (
+            res.documents.length > 0 &&
+            res.documents[0].deletionRequestedAt
+          ) {
+            await account.deleteSession("current").catch(() => {});
+            navigate("/auth");
+            return;
+          }
+        } catch {}
         setUser(u);
         setPlan(u.prefs?.plan || "tier3");
       })
@@ -804,17 +819,48 @@ function SubscriptionSection({ onCancel, user, stats }) {
 
         <div className={styles.subActions} style={{ marginTop: 16 }}>
           {!isActive && !isCancelled && !subscription?.gcMandateId && (
-            <button
-              className={styles.btnPrimary}
-              onClick={handleSubscribe}
-              disabled={loading}
-            >
-              {loading
-                ? "Loading..."
-                : isInTrial
-                  ? "Set up Direct Debit — no charge until trial ends"
-                  : "Subscribe via GoCardless"}
-            </button>
+            <>
+              <button
+                className={styles.btnPrimary}
+                onClick={handleSubscribe}
+                disabled={loading}
+              >
+                {loading
+                  ? "Loading..."
+                  : isInTrial
+                    ? "Set up Direct Debit — no charge until trial ends"
+                    : "Subscribe via GoCardless"}
+              </button>
+              <p
+                style={{
+                  fontSize: 12,
+                  color: "#6B7280",
+                  marginTop: 8,
+                  lineHeight: 1.5,
+                }}
+              >
+                Your Direct Debit details are collected and processed by{" "}
+                <a
+                  href="https://gocardless.com/privacy"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ color: "#6B7280" }}
+                >
+                  GoCardless Ltd
+                </a>{" "}
+                on our behalf as a data processor. By continuing you also agree
+                to the GoCardless{" "}
+                <a
+                  href="https://gocardless.com/legal/end-user-terms"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ color: "#6B7280" }}
+                >
+                  end user terms
+                </a>
+                .
+              </p>
+            </>
           )}
           {isInTrial && subscription?.gcMandateId && (
             <>
@@ -833,13 +879,44 @@ function SubscriptionSection({ onCancel, user, stats }) {
             </button>
           )}
           {isCancelled && (
-            <button
-              className={styles.btnPrimary}
-              onClick={handleSubscribe}
-              disabled={loading}
-            >
-              {loading ? "Loading..." : "Resubscribe via GoCardless"}
-            </button>
+            <>
+              <button
+                className={styles.btnPrimary}
+                onClick={handleSubscribe}
+                disabled={loading}
+              >
+                {loading ? "Loading..." : "Resubscribe via GoCardless"}
+              </button>
+              <p
+                style={{
+                  fontSize: 12,
+                  color: "#6B7280",
+                  marginTop: 8,
+                  lineHeight: 1.5,
+                }}
+              >
+                Your Direct Debit details are collected and processed by{" "}
+                <a
+                  href="https://gocardless.com/privacy"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ color: "#6B7280" }}
+                >
+                  GoCardless Ltd
+                </a>{" "}
+                on our behalf as a data processor. By continuing you also agree
+                to the GoCardless{" "}
+                <a
+                  href="https://gocardless.com/legal/end-user-terms"
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{ color: "#6B7280" }}
+                >
+                  end user terms
+                </a>
+                .
+              </p>
+            </>
           )}
         </div>
       </div>

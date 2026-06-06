@@ -52,13 +52,20 @@ export default async ({ req, res, log, error }) => {
     const rawBody =
       typeof req.body === "string" ? req.body : JSON.stringify(req.body);
 
-    if (GOCARDLESS_WEBHOOK_SECRET && signature) {
-      const expected = createHmac("sha256", GOCARDLESS_WEBHOOK_SECRET)
-        .update(rawBody)
-        .digest("hex");
-      if (expected !== signature) {
-        return res.json({ ok: false, message: "Invalid signature." }, 498);
-      }
+    if (!GOCARDLESS_WEBHOOK_SECRET) {
+      return res.json(
+        { ok: false, message: "Webhook secret not configured." },
+        500,
+      );
+    }
+    if (!signature) {
+      return res.json({ ok: false, message: "Missing signature." }, 401);
+    }
+    const expected = createHmac("sha256", GOCARDLESS_WEBHOOK_SECRET)
+      .update(rawBody)
+      .digest("hex");
+    if (expected !== signature) {
+      return res.json({ ok: false, message: "Invalid signature." }, 401);
     }
 
     const payload =
@@ -208,6 +215,9 @@ export default async ({ req, res, log, error }) => {
               maxProperties: newTierConf.maxProperties,
               monthlyCharge: newTierConf.amount / 100,
             },
+          );
+          log(
+            `Auto-adjusted tier for ${landlordId}: ${currentTier} → ${recommendedTier} (${propertyCount} properties)`,
           );
         }
       }

@@ -1,4 +1,4 @@
-import { Client, Databases, Query } from "node-appwrite";
+import { Client, Databases, Query, ID, Users } from "node-appwrite";
 
 const {
   APPWRITE_FUNCTION_API_ENDPOINT,
@@ -16,6 +16,7 @@ const client = new Client()
   .setKey(APPWRITE_API_KEY);
 
 const databases = new Databases(client);
+const users = new Users(client);
 
 const GC_BASE =
   GOCARDLESS_ENVIRONMENT === "live"
@@ -48,10 +49,20 @@ export default async ({ req, res, log, error }) => {
     const jwt = req.headers?.["x-appwrite-user-jwt"] ?? body.jwt;
     if (!jwt) return res.json({ ok: false, message: "Unauthorised." }, 401);
 
-    const payload = JSON.parse(
-      Buffer.from(jwt.split(".")[1], "base64").toString(),
-    );
-    const landlordId = payload.sub ?? payload.userId;
+    let landlordId;
+    try {
+      const userClient = new Client()
+        .setEndpoint(APPWRITE_FUNCTION_API_ENDPOINT)
+        .setProject(APPWRITE_FUNCTION_PROJECT_ID)
+        .setJWT(jwt);
+      const userAccount = new (await import("node-appwrite")).Account(
+        userClient,
+      );
+      const me = await userAccount.get();
+      landlordId = me.$id;
+    } catch {
+      return res.json({ ok: false, message: "Unauthorised." }, 401);
+    }
 
     const { mandateId } = body;
 
@@ -73,14 +84,19 @@ export default async ({ req, res, log, error }) => {
       return res.json({ ok: false, message: "Unauthorised." }, 401);
     }
 
-    // 2. Cancel the mandate in GoCardless
-    await gcRequest("POST", `/mandates/${mandateId}/actions/cancel`, {
-      data: {},
-    });
+    // 2. Cancel the mandate in GoCardless (best-effort — update Appwrite regardless)
+    try {
+      await gcRequest("POST", `/mandates/${mandateId}/actions/cancel`, {
+        data: {},
+      });
+      log(`Cancelled GoCardless mandate ${mandateId}`);
+    } catch (gcErr) {
+      error(
+        `GoCardless cancel failed for ${mandateId}: ${gcErr?.message} — marking cancelled locally anyway`,
+      );
+    }
 
-    log(`Cancelled GoCardless mandate ${mandateId}`);
-
-    // 3. Update subscription status in Appwrite (reuse ownerCheck result)
+    // 3. Update subscription status in Appwrite
     await databases.updateDocument(
       DATABASE_ID,
       COLLECTION_SUBSCRIPTIONS_ID,

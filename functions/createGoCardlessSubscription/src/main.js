@@ -1,4 +1,4 @@
-import { Client, Databases, Query, ID } from "node-appwrite";
+import { Client, Databases, Query, ID, Users } from "node-appwrite";
 
 const {
   APPWRITE_FUNCTION_API_ENDPOINT,
@@ -17,6 +17,7 @@ const client = new Client()
   .setKey(APPWRITE_API_KEY);
 
 const databases = new Databases(client);
+const users = new Users(client);
 
 const GC_BASE =
   GOCARDLESS_ENVIRONMENT === "live"
@@ -58,11 +59,20 @@ export default async ({ req, res, log, error }) => {
       return res.json({ ok: false, message: "Unauthorised." }, 401);
     }
 
-    // Decode JWT to get landlordId — no need to call Users API, JWT is cryptographically signed
-    const payload = JSON.parse(
-      Buffer.from(jwt.split(".")[1], "base64").toString(),
-    );
-    const landlordId = payload.sub ?? payload.userId;
+    let landlordId;
+    try {
+      const userClient = new Client()
+        .setEndpoint(APPWRITE_FUNCTION_API_ENDPOINT)
+        .setProject(APPWRITE_FUNCTION_PROJECT_ID)
+        .setJWT(jwt);
+      const userAccount = new (await import("node-appwrite")).Account(
+        userClient,
+      );
+      const me = await userAccount.get();
+      landlordId = me.$id;
+    } catch {
+      return res.json({ ok: false, message: "Unauthorised." }, 401);
+    }
 
     // Calculate when trial ends to set correct period start
     const trialSubRes = await databases.listDocuments(
@@ -176,8 +186,6 @@ export default async ({ req, res, log, error }) => {
     }
 
     log("returning hostedUrl: " + hostedUrl);
-    return res.json({ ok: true, hostedUrl });
-
     return res.json({ ok: true, hostedUrl });
   } catch (err) {
     error(err?.message || String(err));
