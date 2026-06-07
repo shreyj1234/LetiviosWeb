@@ -25,7 +25,7 @@ export default function VerifyEmail() {
         setTimeout(() => navigate("/auth"), 2000);
       } catch (err) {
         console.error("updateVerification error:", err.code, err.message);
-        if (err.code === 409) {
+        if (err.code === 409 || err.code === 401) {
           setStatus("success");
           setTimeout(() => navigate("/auth"), 2000);
         } else {
