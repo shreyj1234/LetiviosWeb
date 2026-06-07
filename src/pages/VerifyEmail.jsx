@@ -7,12 +7,15 @@ export default function VerifyEmail() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const [status, setStatus] = useState("waiting");
+  const hasRun = useRef(false);
 
   useEffect(() => {
     const userId = searchParams.get("userId");
     const secret = searchParams.get("secret");
 
     if (!userId || !secret) return;
+    if (hasRun.current) return;
+    hasRun.current = true;
 
     const completeVerification = async () => {
       setStatus("verifying");
@@ -22,7 +25,12 @@ export default function VerifyEmail() {
         setTimeout(() => navigate("/auth"), 2000);
       } catch (err) {
         console.error("updateVerification error:", err.code, err.message);
-        setStatus("error");
+        if (err.code === 409) {
+          setStatus("success");
+          setTimeout(() => navigate("/auth"), 2000);
+        } else {
+          setStatus("error");
+        }
       }
     };
 

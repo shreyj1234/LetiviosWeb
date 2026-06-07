@@ -108,6 +108,8 @@ export default function Auth() {
     if (!email) return showError("Please enter your email address.");
     if (password.length < 8)
       return showError("Password must be at least 8 characters.");
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password))
+      return showError("Password must include a special character.");
     if (password !== confirmPassword)
       return showError("Passwords do not match.");
 
@@ -151,6 +153,7 @@ export default function Auth() {
       await account.createVerification(
         `${window.location.origin}/verify-email`,
       );
+      await account.deleteSession("current");
       navigate("/verify-email");
     } catch (err) {
       showError(err.message || "Something went wrong.");
